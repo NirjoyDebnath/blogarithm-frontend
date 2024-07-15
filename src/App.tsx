@@ -1,7 +1,8 @@
+import LogIn from "./pages/LogIn/logIn";
 function App() {
   return (
     <>
-      <h1>Blogarithm Frontend</h1>
+      <LogIn/>
     </>
   );
 }
