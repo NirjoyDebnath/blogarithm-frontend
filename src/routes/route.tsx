@@ -6,7 +6,7 @@ import SignUp from "../pages/SignUp/signUp";
 const AppRouter = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/login" element={<LogIn />} />
+      <Route path="/logIn" element={<LogIn />} />
       <Route path="/signUp" element={<SignUp />} />
       <Route path="/" element={<HomeLayout />}></Route>
     </Routes>
