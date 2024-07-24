@@ -1,15 +1,25 @@
 import React from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import TextInput from "../../components/TextInput/textInput";
 import Button from "../../components/Button/button";
 import { Link } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
 const LogIn: React.FC = () => {
   const schema = yup.object().shape({
-    userName: yup.string().required(),
-    password: yup.string().min(4).max(20).required(),
+    userName: yup
+      .string()
+      .matches(/^[a-zA-Z0-9]*$/, "Username can not contain special character")
+      .max(15, "Username must be under 15 charcter"),
+    password: yup
+      .string()
+      .matches(
+        /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$/,
+        "The minimum length of Password is 8 and it must contain atleast one character and one number"
+      )
+      .max(30, "Password must be under 30 charcter")
+      .required(),
   });
 
   const {
@@ -42,7 +52,6 @@ const LogIn: React.FC = () => {
                 registerName="userName"
               />
             </div>
-            <p>{errors.userName?.message}</p>
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <div className="flex justify-between w-full">
                 <label className="font-bold">Password</label>
@@ -54,7 +63,6 @@ const LogIn: React.FC = () => {
                   registerName="password"
                 />
               </div>
-              <p>{errors.password?.message}</p>
             </div>
             <Button
               type="submit"
