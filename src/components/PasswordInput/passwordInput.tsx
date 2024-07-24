@@ -1,13 +1,14 @@
 import { IconEye, IconEyeCancel } from "@tabler/icons-react";
 import React, { useState } from "react";
+import { UseFormRegister } from "react-hook-form";
 
 interface IPasswordInput {
-  value: string;
-  onChange: React.ChangeEventHandler<HTMLInputElement> | undefined;
   placeHolder: string;
+  register:UseFormRegister<any>
+  registerName:string;
 }
 
-const PasswordInput = ({ value, onChange, placeHolder }: IPasswordInput) => {
+const PasswordInput = ({ placeHolder, register, registerName }: IPasswordInput) => {
   const [passwordShow, setPasswordShow] = useState({
     state: false,
     icon: <IconEyeCancel />,
@@ -39,11 +40,10 @@ const PasswordInput = ({ value, onChange, placeHolder }: IPasswordInput) => {
         className="w-full h-10 rounded-md bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none  focus:border-none"
         type={passwordShow.type}
         placeholder={placeHolder}
-        value={value}
-        onChange={onChange}
         onKeyDown={handleKeyPress}
+        {...register(registerName)}
       ></input>
-      <button className="border-l-2 px-2" onClick={handleSetPasswordShow}>
+      <button type="button" className="border-l-2 px-2" onClick={handleSetPasswordShow}>
         {passwordShow.icon}
       </button>
     </div>
