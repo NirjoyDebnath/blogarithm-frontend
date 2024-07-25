@@ -5,19 +5,23 @@ import TextInput from "../../components/TextInput/textInput";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { ISignUpInput } from "../../interfaces/auth";
+import { signUp } from "../../api/authAPI";
 
 const SignUp = () => {
-  const schema = yup.object().shape({
-    name: yup
+  const schema: yup.ObjectSchema<ISignUpInput> = yup.object().shape({
+    Name: yup
       .string()
       .matches(/^[a-zA-Z.\s]*$/, "Name can not contain special character")
-      .max(50, "Name must be under 15 charcter"),
-    email: yup.string().email("Provide a valid email"),
-    userName: yup
+      .max(50, "Name must be under 15 charcter")
+      .required(),
+    Email: yup.string().email("Provide a valid email").required(),
+    UserName: yup
       .string()
       .matches(/^[a-zA-Z0-9]*$/, "Username can not contain special character")
-      .max(15, "Username must be under 15 charcter"),
-    password: yup
+      .max(15, "Username must be under 15 charcter")
+      .required(),
+    Password: yup
       .string()
       .matches(
         /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$/,
@@ -25,12 +29,11 @@ const SignUp = () => {
       )
       .max(30, "Password must be under 30 charcter")
       .required(),
-    confirmPassword: yup
+    ConfirmPassword: yup
       .string()
-      .test("match", "Password did not match", function (value) {
-        return value === this.parent.password;
-      })
-      .max(30, "Password must be under 30 charcter"),
+      .max(30, "Password must be under 30 charcter")
+      .oneOf([yup.ref("Password")], "Password did not match")
+      .required(),
   });
 
   const {
@@ -41,8 +44,8 @@ const SignUp = () => {
     resolver: yupResolver(schema),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (data: object) => {
+  const onSubmit = (data: ISignUpInput) => {
+    signUp(data);
     console.log(data);
   };
 
@@ -61,9 +64,11 @@ const SignUp = () => {
                 type="text"
                 placeHolder="Name*"
                 register={register}
-                registerName="name"
+                registerName="Name"
               />
-              <p className="text-authWarning text-red-400">{errors.name?.message}</p>
+              <p className="text-authWarning text-red-400">
+                {errors.Name?.message}
+              </p>
             </div>
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Email</label>
@@ -71,9 +76,11 @@ const SignUp = () => {
                 type="text"
                 placeHolder="Email*"
                 register={register}
-                registerName="email"
+                registerName="Email"
               />
-              <p className="text-authWarning text-red-400">{errors.email?.message}</p>
+              <p className="text-authWarning text-red-400">
+                {errors.Email?.message}
+              </p>
             </div>
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Username</label>
@@ -81,9 +88,11 @@ const SignUp = () => {
                 type="text"
                 placeHolder="Username*"
                 register={register}
-                registerName="userName"
+                registerName="UserName"
               />
-              <p className="text-authWarning text-red-400">{errors.userName?.message}</p>
+              <p className="text-authWarning text-red-400">
+                {errors.UserName?.message}
+              </p>
             </div>
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <div className="flex justify-between w-full">
@@ -93,10 +102,12 @@ const SignUp = () => {
                 <PasswordInput
                   placeHolder="Password*"
                   register={register}
-                  registerName="password"
+                  registerName="Password"
                 />
               </div>
-              <p className="text-authWarning text-red-400">{errors.password?.message}</p>
+              <p className="text-authWarning text-red-400">
+                {errors.Password?.message}
+              </p>
             </div>
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <div className="flex justify-between w-full">
@@ -106,10 +117,12 @@ const SignUp = () => {
                 <PasswordInput
                   placeHolder="Confirm Password*"
                   register={register}
-                  registerName="confirmPassword"
+                  registerName="ConfirmPassword"
                 />
               </div>
-              <p className="text-authWarning text-red-400">{errors.confirmPassword?.message}</p>
+              <p className="text-authWarning text-red-400">
+                {errors.ConfirmPassword?.message}
+              </p>
             </div>
             <Button
               type="submit"
