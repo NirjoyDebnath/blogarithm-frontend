@@ -5,19 +5,22 @@ import { Link } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { logIn } from "../../api/authAPI";
+import { ILogInInput } from "../../interfaces/auth";
 const LogIn: React.FC = () => {
-  const schema = yup.object().shape({
-    userName: yup
+  const schema:yup.ObjectSchema<ILogInInput> = yup.object().shape({
+    UserName: yup
       .string()
       .matches(/^[a-zA-Z0-9]*$/, "Username can not contain special character")
-      .max(15, "Username must be under 15 charcter"),
-    password: yup
+      .max(15, "Username must be under 15 charcter")
+      .required(),
+    Password: yup
       .string()
-      .matches(
-        /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$/,
-        "The minimum length of Password is 8 and it must contain atleast one character and one number"
-      )
+      // .matches(
+      //   /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$/,
+      //   "The minimum length of Password is 8 and it must contain atleast one character and one number"
+      // )
       .max(30, "Password must be under 30 charcter")
       .required(),
   });
@@ -30,8 +33,9 @@ const LogIn: React.FC = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: object) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<ILogInInput> = async (data: ILogInInput) => {
+    logIn(data);
+    console.log("-->", data);
   };
 
   return (
@@ -49,7 +53,7 @@ const LogIn: React.FC = () => {
                 type="text"
                 placeHolder="Username*"
                 register={register}
-                registerName="userName"
+                registerName="UserName"
               />
             </div>
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
@@ -60,7 +64,7 @@ const LogIn: React.FC = () => {
                 <PasswordInput
                   placeHolder="Password*"
                   register={register}
-                  registerName="password"
+                  registerName="Password"
                 />
               </div>
             </div>
