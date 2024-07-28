@@ -1,15 +1,19 @@
 import React from "react";
 import TextInput from "../../components/TextInput/textInput";
 import Button from "../../components/Button/button";
-import { Link } from "react-router-dom";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { logIn } from "../../api/authAPI";
 import { ILogInInput } from "../../interfaces/auth";
+import { getTokenExpire } from "../../helpers/jwtHelper";
+
 const LogIn: React.FC = () => {
-  const schema:yup.ObjectSchema<ILogInInput> = yup.object().shape({
+  const navigate: NavigateFunction = useNavigate();
+
+  const schema: yup.ObjectSchema<ILogInInput> = yup.object().shape({
     UserName: yup
       .string()
       .matches(/^[a-zA-Z0-9]*$/, "Username can not contain special character")
@@ -28,14 +32,15 @@ const LogIn: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit: SubmitHandler<ILogInInput> = async (data: ILogInInput) => {
-    logIn(data);
-    console.log("-->", data);
+    const token: string = await logIn(data);
+    localStorage.setItem("token", token);
+    navigate("/");
+    console.log(getTokenExpire());
   };
 
   return (
@@ -68,12 +73,14 @@ const LogIn: React.FC = () => {
                 />
               </div>
             </div>
+            {/* <Link to=""> */}
             <Button
               type="submit"
               buttonName="Log In"
               backgroundColor="bg-black"
               textColour="text-white"
             />
+            {/* </Link> */}
             <div>
               Don't have an account?&nbsp;
               <Link to="/Signup" className="font-bold hover:underline">
