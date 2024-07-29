@@ -35,7 +35,7 @@ const Header = () => {
     <>
       <div className="flex min-h-20 sticky top-0 h-16 bg-gray-100 items-center">
         <Link to="/" className="flex ml-3">
-          <img src="src\images\logo1.jpg" width="30" height="20" alt="" />
+          <img src="src\images\logo1.jpg" width="30" height="20" alt="" className="rounded-lg"/>
           <div className="text-2xl text-black font-extrabold font-">
             Blogarithm
           </div>
