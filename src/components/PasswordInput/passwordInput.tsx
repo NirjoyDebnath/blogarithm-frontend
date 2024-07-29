@@ -9,7 +9,11 @@ interface IPasswordInput {
   registerName: string;
 }
 
-const PasswordInput = ({ placeHolder, register, registerName }: IPasswordInput) => {
+const PasswordInput = ({
+  placeHolder,
+  register,
+  registerName,
+}: IPasswordInput) => {
   const [passwordShow, setPasswordShow] = useState({
     state: false,
     icon: <IconEyeCancel />,
@@ -41,10 +45,14 @@ const PasswordInput = ({ placeHolder, register, registerName }: IPasswordInput) 
         type={passwordShow.type}
         placeholder={placeHolder}
         // onKeyDown={handleKeyPress}
-      {...register(registerName)}
+        {...register(registerName)}
         required
       ></input>
-      <button type="button" className="border-l-2 px-2" onClick={handleSetPasswordShow}>
+      <button
+        type="button"
+        className="border-l-2 px-2"
+        onClick={handleSetPasswordShow}
+      >
         {passwordShow.icon}
       </button>
     </div>
