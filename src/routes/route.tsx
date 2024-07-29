@@ -4,6 +4,7 @@ import HomeLayout from "../layouts/homeLayout";
 import SignUp from "../pages/SignUp/signUp";
 import Home from "../pages/Home/home";
 import Dummy from "../pages/Dummy/dummy";
+import Story from "../pages/Story/story";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -12,6 +13,7 @@ const AppRouter = () => (
       <Route path="/signUp" element={<SignUp />} />
       <Route path="/" element={<HomeLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/:id" element={<Story />} />
         <Route path="/dummy" element={<Dummy />} />
       </Route>
     </Routes>

@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import {
   ILogInInfo,
   ILogInInput,
@@ -7,22 +6,25 @@ import {
 } from "../interfaces/auth";
 import api from "./initAPI";
 
-export const logIn = async (loginInput: ILogInInput):Promise<string> => {
+export const logIn = async (loginInput: ILogInInput): Promise<string> => {
   try {
     const { UserName, Password }: ILogInInfo = loginInput;
-    const res:AxiosResponse<any, any> = await api.post("/api/auth/logIn", { UserName, Password });
+    const res = await api.post("/api/auth/logIn", {
+      UserName,
+      Password,
+    });
     console.log("Login SuccessFul");
     return res.data.data.token;
   } catch (err) {
     console.log("Login UnsuccessFul", err);
-    throw new Error((err as Error).message)
+    throw new Error((err as Error).message);
   }
 };
 
 export const signUp = async (signUpInput: ISignUpInput) => {
   try {
     const { Name, UserName, Email, Password }: ISignUpInfo = signUpInput;
-    await  api.post("/api/auth/signUp", {
+    await api.post("/api/auth/signUp", {
       Name,
       UserName,
       Email,
