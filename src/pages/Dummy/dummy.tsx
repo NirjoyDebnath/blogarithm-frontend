@@ -1,23 +1,18 @@
-import Header from "../../components/Header/header";
+import React, { ReactNode } from 'react';
 
-const Dummy = () => {
-  console.log("Dummy");
+interface TooltipProps {
+  text: string;
+  children: ReactNode;
+}
+
+const Dummy: React.FC<TooltipProps> = ({ text, children }) => {
   return (
-    <>
-      <Header />
-      <div className="flex">
-      <input
-        type="text"
-        placeholder="Enter text"
-        className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {'buttonText'}
-      </button>
+    <div className="relative inline-block">
+      {children}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max bg-gray-700 text-white text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {text}
+      </div>
     </div>
-    </>
   );
 };
 

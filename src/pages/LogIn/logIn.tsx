@@ -9,6 +9,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { logIn } from "../../api/authAPI";
 import { ILogInInput } from "../../interfaces/auth";
 import { getTokenExpire } from "../../helpers/jwtHelper";
+import { AxiosError } from "axios";
+import SendError from "../../helpers/errorHandler";
+
 
 const LogIn: React.FC = () => {
   const navigate: NavigateFunction = useNavigate();
@@ -37,10 +40,14 @@ const LogIn: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<ILogInInput> = async (data: ILogInInput) => {
-    const token: string = await logIn(data);
-    localStorage.setItem("token", token);
-    navigate("/");
-    console.log(getTokenExpire());
+    try {
+      const token: string = await logIn(data);
+      localStorage.setItem("token", token);
+      navigate("/");
+      console.log(getTokenExpire());
+    } catch (error) {
+      console.log((error as AxiosError).response?.status)
+    }
   };
 
   return (
@@ -51,7 +58,9 @@ const LogIn: React.FC = () => {
           className="grid grid-cols-1 place-items-center w-96 py-10 shadow-xl rounded-md"
           onSubmit={handleSubmit(onSubmit)}
         >
+          <SendError message="hello"></SendError>
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">
+            
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Username</label>
               <TextInput

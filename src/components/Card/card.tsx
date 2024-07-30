@@ -20,7 +20,7 @@ const Card = ({ title, userName, story, id, like, comment }: IStoryCard) => {
   };
   return (
     <>
-      <div className="w-96 flex flex-col items-start p-3 hover:shadow-md border">
+      <div className="w-full h-full flex flex-col items-start p-3 hover:shadow-md border">
         <Link to={id} className="flex-none">
           <h2 className="text-2xl font-bold break-words">{title}</h2>
         </Link>

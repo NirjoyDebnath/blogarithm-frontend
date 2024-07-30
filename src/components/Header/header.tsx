@@ -33,7 +33,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="flex min-h-20 sticky top-0 h-16 bg-gray-100 items-center">
+      <div className="flex min-h-20 sticky top-0 h-16 bg-gray-100 items-center z-10">
         <Link to="/" className="flex ml-3">
           <img src="src\images\logo1.jpg" width="30" height="20" alt="" className="rounded-lg"/>
           <div className="text-2xl text-black font-extrabold font-">
@@ -56,7 +56,7 @@ const Header = () => {
                 </div>
 
                 {dropDown && (
-                  <div className="absolute right-0 top-16 mt-2 w-48 bg-white border border-gray-300  shadow-lg">
+                  <div className="absolute right-0 top-16 mt-2 w-48 bg-white border border-gray-300 shadow-lg">
                     <div className="absolute -top-2 right-28 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-white"></div>
                     <a
                       href="/profile"

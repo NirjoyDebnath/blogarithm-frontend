@@ -9,6 +9,12 @@ interface IDecodeToken {
   exp: number;
 }
 
+export const getToken = (): string | null => {
+  const token: string | null = localStorage.getItem("token");
+  return token;
+};
+
+
 export const getTokenExpire = (): number | null => {
   const token: string | null = localStorage.getItem("token");
   if (!token) return null;
@@ -41,6 +47,17 @@ export const getUserName = (): string|null => {
   const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
   if (decodedToken) {
     return decodedToken.userName;
+  }
+  return null;
+};
+
+export const getUserId = (): string|null => {
+  const token: string | null = localStorage.getItem("token");
+  if (!token) return null;
+
+  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
+  if (decodedToken) {
+    return decodedToken.id;
   }
   return null;
 };
