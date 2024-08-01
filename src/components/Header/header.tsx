@@ -48,7 +48,7 @@ const Header = () => {
             <>
               <div className="flex flex-col mt-1">
                 <div
-                  className="userIcon p-1 mr-4 bg-gray-400 rounded-full cursor-pointer"
+                  className="p-1 mr-4 bg-gray-400 rounded-full cursor-pointer"
                   onClick={handleIconcUser}
                   ref={divRef}
                 >

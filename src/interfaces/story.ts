@@ -17,3 +17,5 @@ export interface ICreateStoryInfo{
   Description: string;
   AuthorUserName: string;
 }
+export interface IUpdateStoryInput extends ICreateStoryInput{}
+export interface IUpdateStoryInfo extends ICreateStoryInput{}

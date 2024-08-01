@@ -1,30 +1,30 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createStory } from "../../api/storyAPI";
+import { createStory, updateStory } from "../../api/storyAPI";
 import { ICreateStoryInput } from "../../interfaces/story";
 import Button from "../Button/button";
-import { useRef } from "react";
 import * as yup from "yup";
-interface IModal {
-  setModal: React.Dispatch<React.SetStateAction<boolean>>;
-}
+import { useContext } from "react";
+import { CreateUpdateContext } from "../../contexts/createupdateContext";
+import { StoryContext } from "../../contexts/storyContext";
 
-const Modal = ({ setModal }: IModal) => {
+const Modal = () => {
+  const { task, storyId, storyTitle, storyDescription, setModal } =
+    useContext(CreateUpdateContext);
+  const { stories, setStories } = useContext(StoryContext);
   const schema: yup.ObjectSchema<ICreateStoryInput> = yup.object().shape({
-    Title: yup.string().max(50, "Title must be under 15 charcter").required(),
+    Title: yup.string().max(50, "Title must be under 50 charcter").required(),
     Description: yup
       .string()
       .min(10, "Description must be atleast 10 charcter")
       .required(),
   });
 
-  const title = useRef<HTMLInputElement>(null);
-  const description = useRef<HTMLTextAreaElement>(null);
-
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && event.currentTarget === event.target) {
       event.preventDefault();
-      if (description.current) description.current.focus();
+      const nextElement = document.querySelector("textarea");
+      if (nextElement) (nextElement as HTMLTextAreaElement).focus();
     }
   };
 
@@ -32,18 +32,37 @@ const Modal = ({ setModal }: IModal) => {
     setModal(false);
   };
 
-  const { register, handleSubmit } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit: SubmitHandler<ICreateStoryInput> = async () => {
+  const onSubmit: SubmitHandler<ICreateStoryInput> = async (
+    data: ICreateStoryInput
+  ) => {
+    console.log("Hello");
     try {
-      await createStory({
-        Title: title.current!.value,
-        Description: description.current!.value,
-      });
+      if (task == "CREATE") await createStory(data);
+      else if (task == "UPDATE" && storyId) {
+        await updateStory(data, storyId);
+        if (stories) {
+          setStories(
+            stories.map((story) => {
+              if (story.Id === storyId) {
+                story.Title = data.Title;
+                story.Description = data.Description;
+              }
+              return story;
+            })
+          );
+        }
+      }
+      setModal(false);
     } catch (err) {
-      console.log("error")
+      console.log(err);
     }
   };
 
@@ -57,7 +76,15 @@ const Modal = ({ setModal }: IModal) => {
           className="absolute flex flex-col items-center min-w-[288px] w-1/2 h-2/3 bg-white rounded-lg"
           onClick={(e) => e.stopPropagation()}
         >
-          <label className="text-4xl font-bold mt-6">Create your story</label>
+          <label className="text-2xl font-bold mt-6">
+            {task === "CREATE" ? "Create" : "Update"} your story
+          </label>
+          <p className="text-authWarning text-red-400">
+            {errors.Description?.message}
+          </p>
+          <p className="text-authWarning text-red-400">
+            {errors.Title?.message}
+          </p>
           <form
             className="grid grid-cols-1 place-items-center w-full h-full"
             onSubmit={handleSubmit(onSubmit)}
@@ -68,24 +95,22 @@ const Modal = ({ setModal }: IModal) => {
                 placeholder="Title"
                 className="border border-black w-5/6 h-10 p-2"
                 onKeyDown={handleKeyPress}
+                defaultValue={storyTitle ? storyTitle : ""}
                 required
-                {...register('Title')}
-                ref = {title}
+                {...register("Title")}
               />
               <textarea
-                id=""
                 className="border border-black w-5/6 h-60 p-2"
                 placeholder="Description"
-                {...register('Description')}
-                ref = {description}
+                defaultValue={storyDescription ? storyDescription : ""}
+                {...register("Description")}
               ></textarea>
               <div className="flex flex-col items-end w-5/6">
                 <Button
                   type="submit"
-                  buttonName="Create"
+                  buttonName={task === "CREATE" ? "Create" : "Update"}
                   backgroundColor="bg-black"
                   textColour="text-white"
-                  // handleClick={onSubmit}
                 />
               </div>
             </div>

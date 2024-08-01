@@ -61,3 +61,14 @@ export const getUserId = (): string|null => {
   }
   return null;
 };
+
+export const getUserRole = (): number|null => {
+  const token: string | null = localStorage.getItem("token");
+  if (!token) return null;
+
+  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
+  if (decodedToken) {
+    return decodedToken.role;
+  }
+  return null;
+};

@@ -1,19 +1,16 @@
-import React, { ReactNode } from 'react';
+import React, { useState } from "react";
+import Card from "../../components/Card/card";
 
-interface TooltipProps {
-  text: string;
-  children: ReactNode;
-}
+const ThreeDotMenu: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-const Dummy: React.FC<TooltipProps> = ({ text, children }) => {
+  const toggleMenu = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
-    <div className="relative inline-block">
-      {children}
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max bg-gray-700 text-white text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        {text}
-      </div>
-    </div>
+    <></>
   );
 };
 
-export default Dummy;
+export default ThreeDotMenu;
