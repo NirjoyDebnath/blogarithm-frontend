@@ -8,9 +8,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { logIn } from "../../api/authAPI";
 import { ILogInInput } from "../../interfaces/auth";
-import { getTokenExpire } from "../../helpers/jwtHelper";
 import { AxiosError } from "axios";
-import { SendError } from "../../components/ShowError/showError";
+import { ShowError } from "../../components/ShowError/showError";
 
 const LogIn: React.FC = () => {
   const navigate: NavigateFunction = useNavigate();
@@ -45,7 +44,6 @@ const LogIn: React.FC = () => {
       const token: string = await logIn(data);
       localStorage.setItem("token", token);
       navigate("/");
-      console.log(getTokenExpire());
     } catch (error) {
       console.log(incorrectInfoError);
       setIncorrectInfoError(true);
@@ -62,11 +60,11 @@ const LogIn: React.FC = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           {incorrectInfoError && (
-            <SendError
+            <ShowError
               message="Incorrect Username or Password"
               time={6000}
               afterFinish={afterFinish}
-            ></SendError>
+            ></ShowError>
           )}
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">
             <div className="grid grid-cols-1 w-full place-items-start gap-1">

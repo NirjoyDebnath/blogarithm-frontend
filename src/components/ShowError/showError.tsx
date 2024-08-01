@@ -7,7 +7,7 @@ interface ISnackbar {
   afterFinish: () => void;
 }
 
-export function SendError({ message, afterFinish }: ISnackbar) {
+export function ShowError({ message, afterFinish }: ISnackbar) {
   // useEffect(() => {
   //   setTimeout(() => {
   //     setOpen(false);

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import TextInput from "../../components/TextInput/textInput";
@@ -6,13 +6,14 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ISignUpInput } from "../../interfaces/auth";
-import { signUp } from "../../api/authAPI";
+import { logIn, signUp } from "../../api/authAPI";
 import { useState } from "react";
-import { SendError } from "../../components/ShowError/showError";
+import { ShowError } from "../../components/ShowError/showError";
 import { AxiosError } from "axios";
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const navigate: NavigateFunction = useNavigate();
 
   const schema: yup.ObjectSchema<ISignUpInput> = yup.object().shape({
     Name: yup
@@ -52,9 +53,12 @@ const SignUp = () => {
   const onSubmit: SubmitHandler<ISignUpInput> = async (data: ISignUpInput) => {
     try {
       await signUp(data);
+      const token: string = await logIn(data);
+      localStorage.setItem("token", token);
+      navigate("/");
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(errorMessage)
+        console.log(errorMessage);
         setErrorMessage(error.response?.data.message);
         console.log(error.response?.data.message);
       } else {
@@ -78,11 +82,11 @@ const SignUp = () => {
         >
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">
             {errorMessage && (
-              <SendError
+              <ShowError
                 message={errorMessage}
                 time={6000}
                 afterFinish={afterFinish}
-              ></SendError>
+              ></ShowError>
             )}
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Name</label>

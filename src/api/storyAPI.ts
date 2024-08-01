@@ -1,38 +1,26 @@
-import { getToken, getUserId, getUserName } from "../helpers/jwtHelper";
-import { ICreateStoryInfo, ICreateStoryInput, IUpdateStoryInput } from "../interfaces/story";
+import { getToken } from "../helpers/jwtHelper";
+import {
+  ICreateStoryInfo,
+  IUpdateStoryInput,
+} from "../interfaces/story";
 import api from "./initAPI";
 
 export const getAllStories = async () => {
-  try {
-    const res = await api.get(`api/story/`);
-    return res.data.data;
-  } catch (error) {
-    return null;
-  }
+  const res = await api.get(`api/story/`);
+  return res.data.data;
 };
 
 export const getStoryById = async (id: string) => {
-  try {
-    const res = await api.get(`api/story/${id}`);
-    return res.data.data;
-  } catch (error) {
-    return null;
-  }
+  const res = await api.get(`api/story/${id}`);
+  return res.data.data;
 };
 
-export const createStory = async (createStoryInput: ICreateStoryInput) => {
-  const AuthorId: string | null = getUserId();
-  const AuthorUserName: string | null = getUserName();
+export const getStoryByUserId = async (id: string) => {
+  const res = await api.get(`api/story?AuthorId=${id}`);
+  return res.data.data;
+};
 
-  if (!AuthorId || !AuthorUserName) {
-    return;
-  }
-
-  const createStoryInfo: ICreateStoryInfo = {
-    ...createStoryInput,
-    AuthorUserName,
-    AuthorId,
-  };
+export const createStory = async (createStoryInfo: ICreateStoryInfo) => {
   try {
     const token = "Bearer " + getToken();
     const res = await api.post(`api/story`, createStoryInfo, {
@@ -44,24 +32,19 @@ export const createStory = async (createStoryInput: ICreateStoryInput) => {
   }
 };
 
-export const updateStory = async (updateStoryInput:IUpdateStoryInput, storyId:string) => {
-  try {
-    const token = "Bearer " + getToken();
-    await api.patch(`api/story/${storyId}`, updateStoryInput, {
-      headers: { Authorization: token },
-    });
-  } catch (error) {
-    return null;
-  }
+export const updateStory = async (
+  updateStoryInput: IUpdateStoryInput,
+  storyId: string
+) => {
+  const token = "Bearer " + getToken();
+  await api.patch(`api/story/${storyId}`, updateStoryInput, {
+    headers: { Authorization: token },
+  });
 };
 
-export const deleteStory = async (storyId:string) => {
-  try {
-    const token = "Bearer " + getToken();
-    await api.delete(`api/story/${storyId}`, {
-      headers: { Authorization: token },
-    });
-  } catch (error) {
-    return null;
-  }
+export const deleteStory = async (storyId: string) => {
+  const token = "Bearer " + getToken();
+  await api.delete(`api/story/${storyId}`, {
+    headers: { Authorization: token },
+  });
 };

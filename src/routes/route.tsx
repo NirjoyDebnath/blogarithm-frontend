@@ -5,6 +5,10 @@ import SignUp from "../pages/SignUp/signUp";
 import Home from "../pages/Home/home";
 import Dummy from "../pages/Dummy/dummy";
 import Story from "../pages/Story/story";
+import Profile from "../pages/Profile/profile";
+import ProfileLayout from "../layouts/profileLayout";
+import ProfileStories from "../pages/Profile/profileStories";
+import ProfileUpdate from "../pages/Profile/profileUpdate";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -12,9 +16,14 @@ const AppRouter = () => (
       <Route path="/logIn" element={<LogIn />} />
       <Route path="/signUp" element={<SignUp />} />
       <Route path="/" element={<HomeLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/:id" element={<Story />} />
-        <Route path="/dummy" element={<Dummy />} />
+        <Route index element={<Home />} />
+        <Route path=":id" element={<Story />} />
+        <Route path="dummy" element={<Dummy />} />
+        <Route path="user/:id" element={<ProfileLayout />}>
+          <Route path="profile" element={<Profile />} />
+          <Route path="stories" element={<ProfileStories />} />
+          <Route path="update" element={<ProfileUpdate />} />
+        </Route>
       </Route>
     </Routes>
   </BrowserRouter>

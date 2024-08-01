@@ -1,14 +1,18 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createStory, updateStory } from "../../api/storyAPI";
-import { ICreateStoryInput } from "../../interfaces/story";
+import { ICreateStoryInfo, ICreateStoryInput } from "../../interfaces/story";
 import Button from "../Button/button";
 import * as yup from "yup";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CreateUpdateContext } from "../../contexts/createupdateContext";
 import { StoryContext } from "../../contexts/storyContext";
+import { getUserId, getUserName } from "../../helpers/jwtHelper";
+import { ShowError } from "../ShowError/showError";
+import { AxiosError } from "axios";
 
 const Modal = () => {
+  const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const { task, storyId, storyTitle, storyDescription, setModal } =
     useContext(CreateUpdateContext);
   const { stories, setStories } = useContext(StoryContext);
@@ -45,8 +49,22 @@ const Modal = () => {
   ) => {
     console.log("Hello");
     try {
-      if (task == "CREATE") await createStory(data);
-      else if (task == "UPDATE" && storyId) {
+      if (task == "CREATE") {
+        const AuthorId = getUserId();
+        const AuthorUserName = getUserName();
+        if (!AuthorId || !AuthorUserName) {
+          setErrorMessage("You are not authorized")
+        }
+        else{
+          const createStoryInfo: ICreateStoryInfo = {
+            AuthorId,
+            AuthorUserName,
+            Title:data.Title,
+            Description:data.Description
+          };
+          await createStory(createStoryInfo);
+        }
+      } else if (task == "UPDATE" && storyId) {
         await updateStory(data, storyId);
         if (stories) {
           setStories(
@@ -61,13 +79,31 @@ const Modal = () => {
         }
       }
       setModal(false);
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(errorMessage);
+        setErrorMessage(error.response?.data.message);
+        console.log(error.response?.data.message);
+      } else {
+        console.log("here");
+        setErrorMessage("An unexpected error occurred.");
+      }
     }
+  };
+
+  const afterFinish = () => {
+    setErrorMessage(false);
   };
 
   return (
     <>
+      {errorMessage && (
+        <ShowError
+          message={errorMessage}
+          time={6000}
+          afterFinish={afterFinish}
+        />
+      )}
       <div
         className="fixed flex h-screen w-screen bg-black bg-opacity-80 items-center justify-center z-20"
         onClick={onDivClick}
