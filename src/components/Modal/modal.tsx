@@ -1,0 +1,124 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { createStory, updateStory } from "../../api/storyAPI";
+import { ICreateStoryInput } from "../../interfaces/story";
+import Button from "../Button/button";
+import * as yup from "yup";
+import { useContext } from "react";
+import { CreateUpdateContext } from "../../contexts/createupdateContext";
+import { StoryContext } from "../../contexts/storyContext";
+
+const Modal = () => {
+  const { task, storyId, storyTitle, storyDescription, setModal } =
+    useContext(CreateUpdateContext);
+  const { stories, setStories } = useContext(StoryContext);
+  const schema: yup.ObjectSchema<ICreateStoryInput> = yup.object().shape({
+    Title: yup.string().max(50, "Title must be under 50 charcter").required(),
+    Description: yup
+      .string()
+      .min(10, "Description must be atleast 10 charcter")
+      .required(),
+  });
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && event.currentTarget === event.target) {
+      event.preventDefault();
+      const nextElement = document.querySelector("textarea");
+      if (nextElement) (nextElement as HTMLTextAreaElement).focus();
+    }
+  };
+
+  const onDivClick = () => {
+    setModal(false);
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit: SubmitHandler<ICreateStoryInput> = async (
+    data: ICreateStoryInput
+  ) => {
+    console.log("Hello");
+    try {
+      if (task == "CREATE") await createStory(data);
+      else if (task == "UPDATE" && storyId) {
+        await updateStory(data, storyId);
+        if (stories) {
+          setStories(
+            stories.map((story) => {
+              if (story.Id === storyId) {
+                story.Title = data.Title;
+                story.Description = data.Description;
+              }
+              return story;
+            })
+          );
+        }
+      }
+      setModal(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <>
+      <div
+        className="fixed flex h-screen w-screen bg-black bg-opacity-80 items-center justify-center z-20"
+        onClick={onDivClick}
+      >
+        <div
+          className="absolute flex flex-col items-center min-w-[288px] w-1/2 h-2/3 bg-white rounded-lg"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <label className="text-2xl font-bold mt-6">
+            {task === "CREATE" ? "Create" : "Update"} your story
+          </label>
+          <p className="text-authWarning text-red-400">
+            {errors.Description?.message}
+          </p>
+          <p className="text-authWarning text-red-400">
+            {errors.Title?.message}
+          </p>
+          <form
+            className="grid grid-cols-1 place-items-center w-full h-full"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <div className="flex flex-col w-full h-full justify-center items-center gap-5">
+              <input
+                type="text"
+                placeholder="Title"
+                className="border border-black w-5/6 h-10 p-2"
+                onKeyDown={handleKeyPress}
+                defaultValue={storyTitle ? storyTitle : ""}
+                required
+                {...register("Title")}
+              />
+              <textarea
+                className="border border-black w-5/6 h-60 p-2"
+                placeholder="Description"
+                defaultValue={storyDescription ? storyDescription : ""}
+                {...register("Description")}
+              ></textarea>
+              <div className="flex flex-col items-end w-5/6">
+                <Button
+                  type="submit"
+                  buttonName={task === "CREATE" ? "Create" : "Update"}
+                  backgroundColor="bg-black"
+                  textColour="text-white"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Modal;

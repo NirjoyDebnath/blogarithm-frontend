@@ -2,13 +2,18 @@ import { Link } from "react-router-dom";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import TextInput from "../../components/TextInput/textInput";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ISignUpInput } from "../../interfaces/auth";
 import { signUp } from "../../api/authAPI";
+import { useState } from "react";
+import { SendError } from "../../components/ShowError/showError";
+import { AxiosError } from "axios";
 
 const SignUp = () => {
+  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+
   const schema: yup.ObjectSchema<ISignUpInput> = yup.object().shape({
     Name: yup
       .string()
@@ -44,9 +49,23 @@ const SignUp = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: ISignUpInput) => {
-    signUp(data);
-    console.log(data);
+  const onSubmit: SubmitHandler<ISignUpInput> = async (data: ISignUpInput) => {
+    try {
+      await signUp(data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(errorMessage)
+        setErrorMessage(error.response?.data.message);
+        console.log(error.response?.data.message);
+      } else {
+        console.log("here");
+        setErrorMessage("An unexpected error occurred.");
+      }
+    }
+  };
+
+  const afterFinish = () => {
+    setErrorMessage(false);
   };
 
   return (
@@ -58,6 +77,13 @@ const SignUp = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">
+            {errorMessage && (
+              <SendError
+                message={errorMessage}
+                time={6000}
+                afterFinish={afterFinish}
+              ></SendError>
+            )}
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Name</label>
               <TextInput
