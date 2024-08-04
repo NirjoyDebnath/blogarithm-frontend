@@ -1,4 +1,4 @@
-import { IconPlus, IconSearch } from "@tabler/icons-react";
+import { IconPlus } from "@tabler/icons-react";
 import Header from "../../components/Header/header";
 import { getUserName } from "../../helpers/jwtHelper";
 import Card from "../../components/Card/card";
@@ -8,6 +8,7 @@ import { IStory } from "../../interfaces/story";
 import Modal from "../../components/Modal/modal";
 import { CreateUpdateContext } from "../../contexts/createupdateContext";
 import { StoryContext } from "../../contexts/storyContext";
+import Search from "../../components/Search/search";
 
 const Home = () => {
   const { task, modal, setModal } =
@@ -23,9 +24,6 @@ const Home = () => {
         console.log(fetch);
         setStories(fetch);
       } catch (error) {}
-      const fetch = await getAllStories();
-      console.log(fetch);
-      setStories(fetch);
     })();
   }, []);
 
@@ -42,19 +40,7 @@ const Home = () => {
       <Header />
       <div className="flex-grow flex flex-col mb-10">
         <div className="flex justify-center py-5 border-b-2 gap-3">
-          <div className="flex rounded-md border border-black focus-within:ring-1 focus-within:ring-black focus-within:border-none w-[250px] sm:w-1/2">
-            <input
-              className="w-full h-10 rounded-md bg-transparent px-3 py-2 text-sm outline-none placeholder:text-gray-600 focus:outline-none focus:border-none"
-              type="text"
-              placeholder="Search by Title..."
-            ></input>
-            <button
-              type="button"
-              className="flex justify-center items-center text-white bg-black min-w-10 sm:min-w-20 rounded-r-md outline-none"
-            >
-              {<IconSearch />}
-            </button>
-          </div>
+          <Search/>
           <button
             type="button"
             className="flex justify-center items-center text-white bg-black w-[40px] h-[40px] rounded-full outline-none"
@@ -71,6 +57,7 @@ const Home = () => {
               key={story.Id}
               title={story.Title}
               id={story.Id}
+              authorId={story.AuthorId}
               userName={story.AuthorUserName}
               story={story.Description}
             />

@@ -13,11 +13,12 @@ interface IStoryCard {
   userName: string;
   story: string;
   id: string;
+  authorId:string
   like?: number;
   comment?: number;
 }
 
-const Card = ({ title, userName, story, id, like, comment }: IStoryCard) => {
+const Card = ({ title, userName, story, id, authorId, like, comment }: IStoryCard) => {
   const [cardMenuShow, setCardMenuShow] = useState<boolean>(false);
   const [deleted, setdeleted] = useState<boolean>(false);
   const cardMenuRef = useRef<HTMLDivElement | null>(null);
@@ -73,7 +74,7 @@ const Card = ({ title, userName, story, id, like, comment }: IStoryCard) => {
         <Link to={id} className="flex-none">
           <h2 className="text-2xl font-bold break-words w-full">{title}</h2>
         </Link>
-        <Link to="" className="mt-1">
+        <Link to={`user/${authorId}/profile`} className="mt-1">
           <p className="text-sm text-gray-500 hover:underline">@{userName}</p>
         </Link>
         <p className="mt-5 flex-grow break-words w-full">
