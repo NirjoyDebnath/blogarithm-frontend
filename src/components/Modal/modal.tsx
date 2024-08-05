@@ -57,8 +57,6 @@ const Modal = () => {
         }
         else{
           const createStoryInfo: ICreateStoryInfo = {
-            AuthorId,
-            AuthorUserName,
             Title:data.Title,
             Description:data.Description
           };

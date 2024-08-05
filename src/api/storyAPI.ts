@@ -1,12 +1,10 @@
 import { getToken } from "../helpers/jwtHelper";
-import {
-  ICreateStoryInfo,
-  IUpdateStoryInput,
-} from "../interfaces/story";
+import { ICreateStoryInfo, IUpdateStoryInput } from "../interfaces/story";
 import api from "./initAPI";
 
 export const getAllStories = async () => {
   const res = await api.get(`api/story/`);
+  console.log(res.data.data);
   return res.data.data;
 };
 

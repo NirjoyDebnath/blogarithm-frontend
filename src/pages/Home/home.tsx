@@ -49,17 +49,11 @@ const Home = () => {
             {<IconPlus />}
           </button>
         </div>
-
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 place-items-center"> */}
-        <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5 ">
+        <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
           {stories && stories.map((story) => (
             <Card
               key={story.Id}
-              title={story.Title}
-              id={story.Id}
-              authorId={story.AuthorId}
-              userName={story.AuthorUserName}
-              story={story.Description}
+              story={story}
             />
           ))}
         </div>

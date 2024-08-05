@@ -1,10 +1,24 @@
+import { IComment } from "./comment";
+import { ILike } from "./like";
+
+export interface IHATEOASLink {
+  href: string;
+  rel: string;
+  type: string;
+}
+
 export interface IStory {
   Id: string;
   AuthorId: string;
   Title: string;
   Description: string;
   AuthorUserName: string;
-  links : object;
+  userLiked:boolean;
+  commentCount:number;
+  comments?:IComment[];
+  likes:ILike[]
+  _links : IHATEOASLink[];
+  CreatedAt: Date;
 }
 
 export interface ICreateStoryInput{
@@ -12,10 +26,8 @@ export interface ICreateStoryInput{
   Description: string;
 }
 export interface ICreateStoryInfo{
-  AuthorId: string;
   Title: string;
   Description: string;
-  AuthorUserName: string;
 }
 export interface IUpdateStoryInput extends ICreateStoryInput{}
 export interface IUpdateStoryInfo extends ICreateStoryInput{}
