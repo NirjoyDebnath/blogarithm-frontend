@@ -10,6 +10,7 @@ import { logIn } from "../../api/authAPI";
 import { ILogInInput } from "../../interfaces/auth";
 import { AxiosError } from "axios";
 import { ShowError } from "../../components/ShowError/showError";
+import { ENV } from "../../config/env";
 
 const LogIn: React.FC = () => {
   const navigate: NavigateFunction = useNavigate();
@@ -43,7 +44,7 @@ const LogIn: React.FC = () => {
     try {
       const token: string = await logIn(data);
       localStorage.setItem("token", token);
-      navigate("/");
+      navigate(ENV.FRONTEND_SERVER_ENDPOINT+"/");
     } catch (error) {
       console.log(incorrectInfoError);
       setIncorrectInfoError(true);

@@ -6,25 +6,28 @@ import {
   IconDownload,
   IconDotsVertical,
 } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { likeStory, unlikeStory } from "../../api/likeAPI";
 import { IStory } from "../../interfaces/story";
 import { AxiosError } from "axios";
 import { jsPDF } from "jspdf";
 import { ENV } from "../../config/env";
+import { StoryContext } from "../../contexts/storyContext";
 
 interface IStoryCard {
   story: IStory;
+  page: "HOME" | "STORY";
 }
 
-const Card = ({ story }: IStoryCard) => {
+const Card = ({ story, page }: IStoryCard) => {
   const [cardMenuShow, setCardMenuShow] = useState<boolean>(false);
   const [deleted, setdeleted] = useState<boolean>(false);
   const [incorrectInfoError, setIncorrectInfoError] = useState(false);
   const [liked, setLiked] = useState(story.userLiked);
   const [likeCount, setLikeCount] = useState(story.likes.length);
   const cardMenuRef = useRef<HTMLDivElement | null>(null);
+  const { setIndex } = useContext(StoryContext);
 
   const handleThreeDots = () => {
     setCardMenuShow((prev) => !prev);
@@ -104,9 +107,9 @@ const Card = ({ story }: IStoryCard) => {
   return (
     <>
       <div
-        className={`relative w-full h-full flex flex-col items-start p-4 hover:shadow-md border ${
-          deleted ? "pointer-events-none opacity-50" : ""
-        }`}
+        className={`relative w-full h-full flex flex-col items-start p-4 ${
+          page === "HOME" ? "hover:shadow-md" : ""
+        } border ${deleted ? "pointer-events-none opacity-50" : ""}`}
       >
         <div className="absolute right-2 top-2 rounded-full" ref={cardMenuRef}>
           <div className="cursor-pointer" onClick={handleThreeDots}>
@@ -125,13 +128,21 @@ const Card = ({ story }: IStoryCard) => {
             )}
           </div>
         </div>
-        {/* <div className="absolute"><CardMenu/></div> */}
-        <Link to={story.Id} className="flex-none">
+        {page === "HOME" ? (
+          <Link to={story.Id} className="flex-none">
+            <h2 className="text-2xl font-bold break-words w-full">
+              {story.Title}
+            </h2>
+          </Link>
+        ) : (
           <h2 className="text-2xl font-bold break-words w-full">
             {story.Title}
           </h2>
-        </Link>
-        <Link to={`user/${story.AuthorId}/profile`} className="mt-1">
+        )}
+        <Link
+          to={`${ENV.FRONTEND_SERVER_ENDPOINT}/user/${story.AuthorId}/profile`}
+          className="mt-1"
+        >
           <p className="text-sm text-gray-500 hover:underline">
             @{story.AuthorUserName}
           </p>
@@ -152,7 +163,7 @@ const Card = ({ story }: IStoryCard) => {
             </div>
             {likeCount}
           </div>
-          <Link to ={story.Id} className="flex text-gray-500">
+          <Link to={story.Id} className="flex text-gray-500">
             <div className="hover:cursor-pointer">{<IconMessageCircle />}</div>
             {story.commentCount}
           </Link>

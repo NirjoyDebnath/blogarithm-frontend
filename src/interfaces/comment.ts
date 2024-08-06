@@ -4,3 +4,7 @@ export interface IComment {
   Comment: string;
   CreatedAt:Date;
 }
+
+export interface ICommentInfo {
+  Comment: string;
+}

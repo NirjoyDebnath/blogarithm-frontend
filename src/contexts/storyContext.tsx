@@ -1,12 +1,16 @@
 import { createContext, useState } from "react";
-import { IStory } from "../interfaces/story";
+import { IStories, IStory } from "../interfaces/story";
 
 interface IStoryContext {
-  stories: IStory[] | null;
-  setStories: React.Dispatch<React.SetStateAction<IStory[] | null>>;
+  index: number | null;
+  setIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  stories: IStories | null;
+  setStories: React.Dispatch<React.SetStateAction<IStories | null>>;
 }
 
 export const StoryContext = createContext<IStoryContext>({
+  index: null,
+  setIndex: () => null,
   stories: null,
   setStories: () => null,
 });
@@ -16,10 +20,13 @@ const CreateUpdateContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [stories, setStories] = useState<IStory[] | null>(null);
+  const [index, setIndex] = useState<number | null>(null);
+  const [stories, setStories] = useState<IStories | null>(null);
   return (
     <StoryContext.Provider
       value={{
+        index,
+        setIndex,
         stories,
         setStories,
       }}

@@ -21,6 +21,11 @@ export interface IStory {
   CreatedAt: Date;
 }
 
+export interface IStories {
+  stories:IStory[],
+  pageCount:number;
+}
+
 export interface ICreateStoryInput{
   Title: string;
   Description: string;

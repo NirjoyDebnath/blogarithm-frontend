@@ -1,7 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createStory, updateStory } from "../../api/storyAPI";
-import { ICreateStoryInfo, ICreateStoryInput } from "../../interfaces/story";
+import {
+  ICreateStoryInfo,
+  ICreateStoryInput,
+  IStory,
+} from "../../interfaces/story";
 import Button from "../Button/button";
 import * as yup from "yup";
 import { useContext, useState } from "react";
@@ -11,7 +15,12 @@ import { getUserId, getUserName } from "../../helpers/jwtHelper";
 import { ShowError } from "../ShowError/showError";
 import { AxiosError } from "axios";
 
-const Modal = () => {
+interface IModal {
+  story?: IStory | null;
+  setStory?: React.Dispatch<React.SetStateAction<IStory | null>>;
+}
+
+const Modal = ({ story, setStory }: IModal) => {
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const { task, storyId, storyTitle, storyDescription, setModal } =
     useContext(CreateUpdateContext);
@@ -53,27 +62,29 @@ const Modal = () => {
         const AuthorId = getUserId();
         const AuthorUserName = getUserName();
         if (!AuthorId || !AuthorUserName) {
-          setErrorMessage("You are not authorized")
-        }
-        else{
+          setErrorMessage("You are not authorized");
+        } else {
           const createStoryInfo: ICreateStoryInfo = {
-            Title:data.Title,
-            Description:data.Description
+            Title: data.Title,
+            Description: data.Description,
           };
           await createStory(createStoryInfo);
         }
       } else if (task == "UPDATE" && storyId) {
         await updateStory(data, storyId);
-        if (stories) {
-          setStories(
-            stories.map((story) => {
-              if (story.Id === storyId) {
-                story.Title = data.Title;
-                story.Description = data.Description;
-              }
-              return story;
-            })
-          );
+        if (story && setStory) {
+          story.Title = data.Title;
+          story.Description = data.Description;
+          setStory(story);
+        } else if (stories && stories.stories) {
+          stories.stories = stories.stories.map((story) => {
+            if (story.Id === storyId) {
+              story.Title = data.Title;
+              story.Description = data.Description;
+            }
+            return story;
+          });
+          setStories(stories);
         }
       }
       setModal(false);
