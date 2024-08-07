@@ -1,6 +1,6 @@
 import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface ISearch {
   querySearch: string;

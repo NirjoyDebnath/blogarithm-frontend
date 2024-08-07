@@ -3,7 +3,6 @@ import LogIn from "../pages/LogIn/logIn";
 import HomeLayout from "../layouts/homeLayout";
 import SignUp from "../pages/SignUp/signUp";
 import Home from "../pages/Home/home";
-import Dummy from "../pages/Dummy/dummy";
 import Story from "../pages/Story/story";
 import Profile from "../pages/Profile/profile";
 import ProfileLayout from "../layouts/profileLayout";
@@ -18,7 +17,6 @@ const AppRouter = () => (
       <Route path="/" element={<HomeLayout />}>
         <Route index element={<Home />} />
         <Route path=":id" element={<Story />} />
-        <Route path="dummy" element={<Dummy />} />
         <Route path="user/:id" element={<ProfileLayout />}>
           <Route path="profile" element={<Profile />} />
           <Route path="stories" element={<ProfileStories />} />

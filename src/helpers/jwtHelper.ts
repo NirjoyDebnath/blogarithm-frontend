@@ -14,7 +14,6 @@ export const getToken = (): string | null => {
   return token;
 };
 
-
 export const getTokenExpire = (): number | null => {
   const token: string | null = localStorage.getItem("token");
   if (!token) return null;
@@ -40,7 +39,7 @@ export const isUserLoggedIn = (): boolean => {
   return !isTokenExpired();
 };
 
-export const getUserName = (): string|null => {
+export const getUserName = (): string | null => {
   const token: string | null = localStorage.getItem("token");
   if (!token) return null;
 
@@ -51,7 +50,7 @@ export const getUserName = (): string|null => {
   return null;
 };
 
-export const getUserId = (): string|null => {
+export const getUserId = (): string | null => {
   const token: string | null = localStorage.getItem("token");
   if (!token) return null;
 
@@ -62,7 +61,7 @@ export const getUserId = (): string|null => {
   return null;
 };
 
-export const getUserRole = (): number|null => {
+export const getUserRole = (): number | null => {
   const token: string | null = localStorage.getItem("token");
   if (!token) return null;
 

@@ -1,6 +1,5 @@
 import { IconPlus } from "@tabler/icons-react";
 import Header from "../../components/Header/header";
-import { getUserName } from "../../helpers/jwtHelper";
 import Card from "../../components/Card/card";
 import { getAllStories } from "../../api/storyAPI";
 import { useContext, useEffect, useState } from "react";
@@ -22,35 +21,33 @@ const Home = () => {
   const [searchParams] = useSearchParams();
   const querySearch = searchParams.get("search");
   const queryPage = searchParams.get("page");
-  const [page, setPage] = useState(Number(queryPage)||1)
-  const [search, setSearch] = useState(querySearch||"")
+  const [page, setPage] = useState(Number(queryPage) || 1);
+  const [search, setSearch] = useState(querySearch || "");
   const navigate: NavigateFunction = useNavigate();
-
-  const userName = getUserName();
 
   useEffect(() => {
     (async () => {
       try {
         if (search) {
-          console.log(search);
-          const fetch: IStories = await getAllStories(search, page);
+          const fetch: IStories = await getAllStories(page, search);
           setStories(fetch);
         } else {
-          console.log("nosearch");
-          const fetch: IStories = await getAllStories(undefined);
+          const fetch: IStories = await getAllStories(page);
           setStories(fetch);
         }
       } catch (error) {
         console.log("something went wrong");
       }
     })();
-  }, [page, search]);
+  }, [page, search, setStories]);
 
   useEffect(() => {
-    setSearch(querySearch||"");
+    setSearch(querySearch || "");
   }, [querySearch]);
 
-  console.log("Home", userName, search);
+  useEffect(() => {
+    setPage(Number(queryPage) || 1);
+  }, [queryPage]);
 
   const handleCreateButton = () => {
     setModal(true);
@@ -62,17 +59,8 @@ const Home = () => {
   ) => {
     (async () => {
       try {
-        if (search) {
-          console.log(search);
-          const fetch: IStories = await getAllStories(search, page);
-          setStories(fetch);
-        } else {
-          console.log("nosearch");
-          const fetch: IStories = await getAllStories(undefined, page);
-          setStories(fetch);
-        }
         const searchQuery = search ? "&search=" + search : "";
-        setPage(page)
+        setPage(page);
         navigate("?page=" + page + searchQuery);
       } catch (error) {
         console.log("something went wrong");
@@ -87,7 +75,7 @@ const Home = () => {
       <Header />
       <div className="flex-grow flex flex-col mb-10">
         <div className="flex justify-center py-5 border-b-2 gap-3">
-          <Search querySearch={search}/>
+          <Search querySearch={search} />
           <button
             type="button"
             className="flex justify-center items-center text-white bg-black w-[40px] h-[40px] rounded-full outline-none"
@@ -99,11 +87,18 @@ const Home = () => {
         <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
           {stories?.stories &&
             stories.stories.map((story) => (
-              <Card key={story.Id} story={story} page="HOME" />
+              <div className="w-full h-full border">
+                <Card key={story.Id} story={story} page="HOME" />
+              </div>
+              //
             ))}
         </div>
         <div className="flex justify-center mb-5 rounded-full">
-          <Pagination count={stories?.pageCount} onChange={handlePagination} page={page}/>
+          <Pagination
+            count={stories?.pageCount}
+            onChange={handlePagination}
+            page={page}
+          />
         </div>
       </div>
     </>

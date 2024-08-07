@@ -2,7 +2,7 @@ export interface ILogInInput {
   UserName: string;
   Password: string;
 }
-export interface ILogInInfo extends ILogInInput{}
+export interface ILogInInfo extends ILogInInput {}
 
 export interface ISignUpInput {
   Name: string;
@@ -11,4 +11,4 @@ export interface ISignUpInput {
   Password: string;
   ConfirmPassword: string;
 }
-export interface ISignUpInfo extends ISignUpInput{}
+export interface ISignUpInfo extends ISignUpInput {}

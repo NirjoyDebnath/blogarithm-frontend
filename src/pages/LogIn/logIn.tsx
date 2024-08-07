@@ -8,13 +8,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { logIn } from "../../api/authAPI";
 import { ILogInInput } from "../../interfaces/auth";
-import { AxiosError } from "axios";
 import { ShowError } from "../../components/ShowError/showError";
-import { ENV } from "../../config/env";
+import { AxiosError } from "axios";
 
 const LogIn: React.FC = () => {
   const navigate: NavigateFunction = useNavigate();
-  const [incorrectInfoError, setIncorrectInfoError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | false>(false);
 
   const schema: yup.ObjectSchema<ILogInInput> = yup.object().shape({
     UserName: yup
@@ -24,10 +23,6 @@ const LogIn: React.FC = () => {
       .required(),
     Password: yup
       .string()
-      // .matches(
-      //   /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$/,
-      //   "The minimum length of Password is 8 and it must contain atleast one character and one number"
-      // )
       .max(30, "Password must be under 30 charcter")
       .required(),
   });
@@ -36,20 +31,23 @@ const LogIn: React.FC = () => {
     resolver: yupResolver(schema),
   });
 
-  const afterFinish = () => {
-    setIncorrectInfoError(false);
-  };
-
   const onSubmit: SubmitHandler<ILogInInput> = async (data: ILogInInput) => {
     try {
       const token: string = await logIn(data);
       localStorage.setItem("token", token);
-      navigate(ENV.FRONTEND_SERVER_ENDPOINT+"/");
+      navigate("/");
     } catch (error) {
-      console.log(incorrectInfoError);
-      setIncorrectInfoError(true);
-      console.log((error as AxiosError).response?.status);
+      console.log("in log in error")
+      if (error instanceof AxiosError) {
+        setErrorMessage(error.response?.data.message);
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
     }
+  };
+
+  const afterFinish = () => {
+    setErrorMessage(false);
   };
 
   return (
@@ -60,9 +58,9 @@ const LogIn: React.FC = () => {
           className="grid grid-cols-1 place-items-center w-96 py-10 shadow-xl rounded-md"
           onSubmit={handleSubmit(onSubmit)}
         >
-          {incorrectInfoError && (
+          {errorMessage && (
             <ShowError
-              message="Incorrect Username or Password"
+              message={errorMessage}
               time={6000}
               afterFinish={afterFinish}
             ></ShowError>

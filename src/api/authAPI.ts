@@ -7,18 +7,6 @@ import {
 import api from "./initAPI";
 
 export const logIn = async (loginInput: ILogInInput): Promise<string> => {
-  // try {
-  //   const { UserName, Password }: ILogInInfo = loginInput;
-  //   const res = await api.post("/api/auth/logIn", {
-  //     UserName,
-  //     Password,
-  //   });
-  //   console.log("Login SuccessFul");
-  //   return res.data.data.token;
-  // } catch (err) {
-  //   console.log("Login UnsuccessFul", err);
-  //   throw err;
-  // }
   const { UserName, Password }: ILogInInfo = loginInput;
   const res = await api.post("/api/auth/logIn", {
     UserName,

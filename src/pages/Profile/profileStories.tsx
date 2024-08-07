@@ -35,14 +35,14 @@ const ProfileStories = () => {
           if (search) {
             const fetch: IStories = await getStoryByUserId(
               params.id,
-              search,
-              page
+              page,
+              search
             );
             setStories(fetch);
           } else {
             const fetch: IStories = await getStoryByUserId(
               params.id,
-              undefined
+              page
             );
             setStories(fetch);
           }
@@ -62,6 +62,10 @@ const ProfileStories = () => {
   useEffect(() => {
     setSearch(querySearch || "");
   }, [querySearch]);
+
+  useEffect(() => {
+    setPage(Number(queryPage) || 1);
+  }, [queryPage]);
 
   const handlePagination = (
     event: React.ChangeEvent<unknown>,

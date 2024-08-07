@@ -6,14 +6,23 @@ import {
   IconDownload,
   IconDotsVertical,
 } from "@tabler/icons-react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { likeStory, unlikeStory } from "../../api/likeAPI";
 import { IStory } from "../../interfaces/story";
 import { AxiosError } from "axios";
 import { jsPDF } from "jspdf";
 import { ENV } from "../../config/env";
-import { StoryContext } from "../../contexts/storyContext";
+import { ShowError } from "../ShowError/showError";
+import { format } from "date-fns";
+import {
+  setCreatedAt,
+  setDescription,
+  setTitle,
+  setUserName,
+  setWebnameandpage,
+  wrapText,
+} from "../../helpers/jsPDFHelper";
 
 interface IStoryCard {
   story: IStory;
@@ -23,11 +32,10 @@ interface IStoryCard {
 const Card = ({ story, page }: IStoryCard) => {
   const [cardMenuShow, setCardMenuShow] = useState<boolean>(false);
   const [deleted, setdeleted] = useState<boolean>(false);
-  const [incorrectInfoError, setIncorrectInfoError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const [liked, setLiked] = useState(story.userLiked);
   const [likeCount, setLikeCount] = useState(story.likes.length);
   const cardMenuRef = useRef<HTMLDivElement | null>(null);
-  const { setIndex } = useContext(StoryContext);
 
   const handleThreeDots = () => {
     setCardMenuShow((prev) => !prev);
@@ -45,41 +53,24 @@ const Card = ({ story, page }: IStoryCard) => {
         setLikeCount((prev) => prev + 1);
       }
     } catch (error) {
-      console.log(incorrectInfoError);
-      setIncorrectInfoError(true);
-      console.log((error as AxiosError).response?.status);
+      if (error instanceof AxiosError) {
+        setErrorMessage(error.response?.data.message);
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
     }
   };
 
   const handleDownload = () => {
     const doc = new jsPDF();
+    let currentY: number = 20;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(30);
-    doc.textWithLink("Title: " + story.Title, 10, 10, {
-      url: ENV.FRONTEND_SERVER_ENDPOINT + `/${story.Id}`,
-    });
+    setWebnameandpage(doc);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(" " + story.CreatedAt.toString(), 10, 17);
-
-    doc.textWithLink(" @" + story.AuthorUserName, 10, 24, {
-      url: ENV.FRONTEND_SERVER_ENDPOINT + `/user/${story.AuthorId}/profile`,
-    });
-
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("Description: ", 10, 40);
-    doc.setFont("helvetica", "normal");
-    doc.text(story.Description, 57, 40);
-
-    doc.setFontSize(10);
-    const textWidth = doc.getTextWidth("Blogarithm");
-    const pageWidth = doc.internal.pageSize.width;
-    const x = (pageWidth - textWidth) / 2;
-    const y = doc.internal.pageSize.height - 10;
-    doc.text("Blogarithm", x, y);
+    currentY = setTitle(doc, currentY, story.Title, story.Id);
+    currentY = setCreatedAt(doc, currentY, story.CreatedAt.toString());
+    currentY = setUserName(doc, currentY, story.AuthorUserName, story.AuthorId);
+    setDescription(doc, currentY, story.Description);
 
     doc.save(story.Title + ".pdf");
   };
@@ -93,8 +84,9 @@ const Card = ({ story, page }: IStoryCard) => {
     }
   };
 
-  const cutblog = (blog: string) => {
-    return blog.length > 200 ? blog.slice(0, 200) + "..." : blog;
+  const cutStory = (story: string) => {
+    if (page === "STORY") return story.slice(1);
+    else return story.length > 200 ? story.slice(1, 200) + "..." : story;
   };
 
   useEffect(() => {
@@ -104,12 +96,23 @@ const Card = ({ story, page }: IStoryCard) => {
     };
   }, []);
 
+  const afterFinish = () => {
+    setErrorMessage(false);
+  };
+
   return (
     <>
+      {errorMessage && (
+        <ShowError
+          message={errorMessage}
+          time={6000}
+          afterFinish={afterFinish}
+        ></ShowError>
+      )}
       <div
         className={`relative w-full h-full flex flex-col items-start p-4 ${
           page === "HOME" ? "hover:shadow-md" : ""
-        } border ${deleted ? "pointer-events-none opacity-50" : ""}`}
+        }  ${deleted ? "pointer-events-none opacity-50" : ""}`}
       >
         <div className="absolute right-2 top-2 rounded-full" ref={cardMenuRef}>
           <div className="cursor-pointer" onClick={handleThreeDots}>
@@ -129,7 +132,7 @@ const Card = ({ story, page }: IStoryCard) => {
           </div>
         </div>
         {page === "HOME" ? (
-          <Link to={story.Id} className="flex-none">
+          <Link to={"/" + story.Id} className="flex-none">
             <h2 className="text-2xl font-bold break-words w-full">
               {story.Title}
             </h2>
@@ -143,27 +146,33 @@ const Card = ({ story, page }: IStoryCard) => {
           to={`${ENV.FRONTEND_SERVER_ENDPOINT}/user/${story.AuthorId}/profile`}
           className="mt-1"
         >
-          <p className="text-sm text-gray-500 hover:underline">
+          <p className="text-sm font-semibold text-gray-600 hover:underline mb-1">
             @{story.AuthorUserName}
           </p>
         </Link>
-        <label className="text-xs">{story.CreatedAt.toString()}</label>
-        <p className="mt-5 flex-grow break-words w-full">
-          &nbsp;&nbsp;{cutblog(story.Description)}&nbsp;
-          {story.Description.length > 200 && (
-            <Link to={story.Id} className="font-semibold hover:underline">
+        <label className="text-xs">
+          {format(new Date(story.CreatedAt), "yyyy-MM-dd h:mma")}
+        </label>
+
+        <div className="mt-5 flex-grow break-words w-full">
+          &nbsp;&nbsp;
+          <span className="text-xl">{story.Description.charAt(0)}</span>
+          {cutStory(story.Description)}
+          {story.Description.length > 200 && page === "HOME" && (
+            <Link to={"/" + story.Id} className="font-semibold hover:underline">
               Show More
             </Link>
           )}
-        </p>
-        <div className="flex w-full justify-evenly pt-3">
+        </div>
+
+        <div className="flex w-full justify-around pt-3">
           <div className="flex text-gray-500">
             <div className="hover:cursor-pointer" onClick={handleLikeStory}>
               {liked ? <IconThumbUpFilled /> : <IconThumbUp />}
             </div>
             {likeCount}
           </div>
-          <Link to={story.Id} className="flex text-gray-500">
+          <Link to={"/" + story.Id} className="flex text-gray-500">
             <div className="hover:cursor-pointer">{<IconMessageCircle />}</div>
             {story.commentCount}
           </Link>

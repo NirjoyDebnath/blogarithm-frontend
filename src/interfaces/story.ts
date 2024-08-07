@@ -13,26 +13,26 @@ export interface IStory {
   Title: string;
   Description: string;
   AuthorUserName: string;
-  userLiked:boolean;
-  commentCount:number;
-  comments?:IComment[];
-  likes:ILike[]
-  _links : IHATEOASLink[];
+  userLiked: boolean;
+  commentCount: number;
+  comments?: IComment[];
+  likes: ILike[];
+  _links: IHATEOASLink[];
   CreatedAt: Date;
 }
 
 export interface IStories {
-  stories:IStory[],
-  pageCount:number;
+  stories: IStory[];
+  pageCount: number;
 }
 
-export interface ICreateStoryInput{
+export interface ICreateStoryInput {
   Title: string;
   Description: string;
 }
-export interface ICreateStoryInfo{
+export interface ICreateStoryInfo {
   Title: string;
   Description: string;
 }
-export interface IUpdateStoryInput extends ICreateStoryInput{}
-export interface IUpdateStoryInfo extends ICreateStoryInput{}
+export interface IUpdateStoryInput extends ICreateStoryInput {}
+export interface IUpdateStoryInfo extends ICreateStoryInput {}

@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createStory, updateStory } from "../../api/storyAPI";
+import { createStory, getAllStories, updateStory } from "../../api/storyAPI";
 import {
   ICreateStoryInfo,
   ICreateStoryInput,
@@ -14,6 +14,7 @@ import { StoryContext } from "../../contexts/storyContext";
 import { getUserId, getUserName } from "../../helpers/jwtHelper";
 import { ShowError } from "../ShowError/showError";
 import { AxiosError } from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface IModal {
   story?: IStory | null;
@@ -21,6 +22,7 @@ interface IModal {
 }
 
 const Modal = ({ story, setStory }: IModal) => {
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const { task, storyId, storyTitle, storyDescription, setModal } =
     useContext(CreateUpdateContext);
@@ -56,7 +58,6 @@ const Modal = ({ story, setStory }: IModal) => {
   const onSubmit: SubmitHandler<ICreateStoryInput> = async (
     data: ICreateStoryInput
   ) => {
-    console.log("Hello");
     try {
       if (task == "CREATE") {
         const AuthorId = getUserId();
@@ -69,6 +70,8 @@ const Modal = ({ story, setStory }: IModal) => {
             Description: data.Description,
           };
           await createStory(createStoryInfo);
+          setStories(await getAllStories());
+          navigate("/");
         }
       } else if (task == "UPDATE" && storyId) {
         await updateStory(data, storyId);
@@ -90,11 +93,8 @@ const Modal = ({ story, setStory }: IModal) => {
       setModal(false);
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(errorMessage);
         setErrorMessage(error.response?.data.message);
-        console.log(error.response?.data.message);
       } else {
-        console.log("here");
         setErrorMessage("An unexpected error occurred.");
       }
     }

@@ -38,7 +38,7 @@ const Header = () => {
         <Link to="/" className="flex ml-3">
           <img src="\src\images\logo1.jpg" width="30" height="20" alt="" className="rounded-lg"/>
           <div className="text-2xl text-black font-extrabold font-">
-            Blogarithm
+            logarithm
           </div>
         </Link>
         {/* <Link to="/dummy">
@@ -65,12 +65,12 @@ const Header = () => {
                     >
                       Profile
                     </Link>
-                    <a
+                    {/* <a
                       href="/settings"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
                     >
                       Settings
-                    </a>
+                    </a> */}
                   </div>
                 )}
               </div>
@@ -79,8 +79,8 @@ const Header = () => {
                 <Button
                   type="button"
                   buttonName="Log Out"
-                  backgroundColor=""
-                  textColour="text-black"
+                  backgroundColor="bg-black"
+                  textColour="text-white"
                   handleClick={handleLogout}
                 />
               </div>
@@ -91,16 +91,16 @@ const Header = () => {
                 <Button
                   type="button"
                   buttonName="Sign Up"
-                  backgroundColor=""
-                  textColour="text-black"
+                  backgroundColor="bg-black"
+                  textColour="text-white"
                 />
               </Link>
               <Link to="/LogIn" className="mr-5">
                 <Button
                   type="button"
                   buttonName="Log In"
-                  backgroundColor=""
-                  textColour="text-black"
+                  backgroundColor="bg-black"
+                  textColour="text-white"
                 />
               </Link>
             </>

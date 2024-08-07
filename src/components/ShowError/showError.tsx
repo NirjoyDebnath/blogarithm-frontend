@@ -8,12 +8,6 @@ interface ISnackbar {
 }
 
 export function ShowError({ message, afterFinish }: ISnackbar) {
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setOpen(false);
-  //   }, time);
-  // }, []);
-
   return (
     <div>
       <Snackbar

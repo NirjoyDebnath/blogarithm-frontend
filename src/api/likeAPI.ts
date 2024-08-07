@@ -15,7 +15,6 @@ export const getLikesByStoryId = async (storyId: string) => {
 
 export const unlikeStory = async (storyId: string) => {
   const token = "Bearer " + getToken();
-  console.log(token)
   await api.delete(`api/like/${storyId}`, {
     headers: { Authorization: token },
   });

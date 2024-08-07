@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { IStories, IStory } from "../interfaces/story";
+import { IStories } from "../interfaces/story";
 
 interface IStoryContext {
   index: number | null;

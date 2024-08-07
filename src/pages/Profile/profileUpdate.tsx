@@ -79,11 +79,8 @@ const ProfileUpdate = () => {
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(errorMessage);
         setErrorMessage(error.response?.data.message);
-        console.log(error.response?.data.message);
       } else {
-        console.log("here");
         setErrorMessage("An unexpected error occurred.");
       }
     }
@@ -99,11 +96,8 @@ const ProfileUpdate = () => {
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(errorMessage);
         setErrorMessage(error.response?.data.message);
-        console.log(error.response?.data.message);
       } else {
-        console.log("here");
         setErrorMessage("An unexpected error occurred.");
       }
     }

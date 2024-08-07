@@ -2,7 +2,7 @@ import { getToken } from "../helpers/jwtHelper";
 import { ICreateStoryInfo, IUpdateStoryInput } from "../interfaces/story";
 import api from "./initAPI";
 
-export const getAllStories = async (search: string | undefined, page = 1) => {
+export const getAllStories = async (page = 1, search?: string) => {
   search = search ? `&search=${search}` : "";
   const res = await api.get(`api/story/?page=${page}${search}`);
   return res.data.data;
@@ -15,8 +15,8 @@ export const getStoryById = async (id: string) => {
 
 export const getStoryByUserId = async (
   id: string,
-  search: string | undefined,
-  page = 1
+  page = 1,
+  search?: string
 ) => {
   search = search ? `&search=${search}` : "";
   const res = await api.get(`api/story?AuthorId=${id}&page=${page}${search}`);

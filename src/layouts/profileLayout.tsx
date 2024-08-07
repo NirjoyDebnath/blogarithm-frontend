@@ -5,7 +5,6 @@ import { NavLink, Outlet, useParams } from "react-router-dom";
 const ProfileLayout = () => {
   const params = useParams<{ id: string }>();
   const userId = getUserId();
-  console.log(params.id, userId);
 
   return (
     <>
