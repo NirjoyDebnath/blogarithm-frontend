@@ -1,4 +1,4 @@
-import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import { Link, NavigateFunction, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import TextInput from "../../components/TextInput/textInput";
@@ -14,6 +14,7 @@ import { AxiosError } from "axios";
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const navigate: NavigateFunction = useNavigate();
+  const location = useLocation()
 
   const schema: yup.ObjectSchema<ISignUpInput> = yup.object().shape({
     Name: yup
@@ -159,7 +160,7 @@ const SignUp = () => {
             />
             <div>
               Already have an account?&nbsp;
-              <Link to="/logIn" className="font-bold hover:underline">
+              <Link state={location.state.prev} to="/logIn" className="font-bold hover:underline">
                 Log In
               </Link>
             </div>

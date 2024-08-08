@@ -10,6 +10,9 @@ import { AxiosError } from "axios";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import { ShowError } from "../../components/ShowError/showError";
+import Header from "../../components/Header/header";
+import ProfileNavbar from "../../components/Navbar/profileNavbar";
+import LogIn from "../../components/Modal/logIn";
 
 const ProfileUpdate = () => {
   const params = useParams<{ id: string }>();
@@ -122,6 +125,9 @@ const ProfileUpdate = () => {
           afterFinish={afterFinish}
         />
       )}
+      <LogIn/>
+      <Header/>
+      <ProfileNavbar id={params.id!}/>
       <div className="flex w-full h-10 bg-gray-800 items-center justify-evenly">
         <div
           className="text-white text-center cursor-pointer"
@@ -139,7 +145,7 @@ const ProfileUpdate = () => {
       {update === "PROFILE" ? (
         <div className="p-5">
           <form
-            className="grid grid-cols-1 place-items-end w-96 gap-2"
+            className="grid grid-cols-1 place-items-end max-w-96 gap-2"
             onSubmit={editUserHandleSubmit(onSubmitEditProfile)}
           >
             <div className="grid grid-cols-1 w-full place-items-start gap-1">

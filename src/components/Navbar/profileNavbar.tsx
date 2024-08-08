@@ -1,19 +1,16 @@
-import Header from "../components/Header/header";
-import { getUserId } from "../helpers/jwtHelper";
-import { NavLink, Outlet, useParams } from "react-router-dom";
+import { NavLink } from 'react-router-dom'
+import { isAuthorizedWithToken } from '../../helpers/authHelper'
 
-const ProfileLayout = () => {
-  const params = useParams<{ id: string }>();
-  const userId = getUserId();
+interface IProfileNavbar{
+  id: string;
+}
 
+const ProfileNavbar = ({id}:IProfileNavbar) => {
   return (
-    <>
-      <Header />
-
-      <div className="">
+    <div className="">
         <div className="flex justify-evenly items-center h-10 w-full bg-gray-800">
           <NavLink
-            to="profile"
+            to={"/user/"+id+"/profile"}
             className={({ isActive }) =>
               `text-white ${isActive ? "font-bold" : ""}`
             }
@@ -21,16 +18,16 @@ const ProfileLayout = () => {
             Profile
           </NavLink>
           <NavLink
-            to="stories"
+            to={"/user/"+id+"/stories"}
             className={({ isActive }) =>
               `text-white ${isActive ? "font-bold" : ""}`
             }
           >
             Stories
           </NavLink>
-          {userId === params.id && (
+          {isAuthorizedWithToken(id) && (
             <NavLink
-              to="update"
+              to={"/user/"+id+"/update"}
               className={({ isActive }) =>
                 `text-white ${isActive ? "font-bold" : ""}`
               }
@@ -40,9 +37,7 @@ const ProfileLayout = () => {
           )}
         </div>
       </div>
-      <Outlet />
-    </>
-  );
-};
+  )
+}
 
-export default ProfileLayout;
+export default ProfileNavbar

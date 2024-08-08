@@ -21,8 +21,11 @@ import {
   setTitle,
   setUserName,
   setWebnameandpage,
-  wrapText,
 } from "../../helpers/jsPDFHelper";
+import { getUserId } from "../../helpers/jwtHelper";
+import Tooltip from "@mui/material/Tooltip";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 interface IStoryCard {
   story: IStory;
@@ -30,10 +33,13 @@ interface IStoryCard {
 }
 
 const Card = ({ story, page }: IStoryCard) => {
+  const userId = getUserId();
   const [cardMenuShow, setCardMenuShow] = useState<boolean>(false);
   const [deleted, setdeleted] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
-  const [liked, setLiked] = useState(story.userLiked);
+  const [liked, setLiked] = useState(
+    story.likes.some((like) => like.UserId === userId)
+  );
   const [likeCount, setLikeCount] = useState(story.likes.length);
   const cardMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -41,14 +47,14 @@ const Card = ({ story, page }: IStoryCard) => {
     setCardMenuShow((prev) => !prev);
   };
 
-  const handleLikeStory = () => {
+  const handleLikeStory = async () => {
     try {
       if (liked) {
-        unlikeStory(story.Id);
+        await unlikeStory(story.Id);
         setLiked(false);
         setLikeCount((prev) => prev - 1);
       } else {
-        likeStory(story.Id);
+        await likeStory(story.Id);
         setLiked(true);
         setLikeCount((prev) => prev + 1);
       }
@@ -166,12 +172,30 @@ const Card = ({ story, page }: IStoryCard) => {
         </div>
 
         <div className="flex w-full justify-around pt-3">
+          <Tooltip title={
+          <Box sx={{ p: 1 }}>
+            {[
+  "apple", "banana", "cherry", "date", "elderberry",
+  "fig", "grape", "honeydew", "kiwi", "lemon",
+  "mango", "nectarine", "orange", "papaya", "quince",
+  "raspberry", "strawberry", "tangerine", "ugli", "vanilla",
+  "watermelon", "xigua", "yellowfruit", "zucchini"
+].map((like, index) => (
+              <Typography key={index}>{like}</Typography>
+            ))}</Box>}>
           <div className="flex text-gray-500">
             <div className="hover:cursor-pointer" onClick={handleLikeStory}>
               {liked ? <IconThumbUpFilled /> : <IconThumbUp />}
             </div>
             {likeCount}
           </div>
+          </Tooltip>
+          {/* <div className="flex text-gray-500">
+            <div className="hover:cursor-pointer" onClick={handleLikeStory}>
+              {liked ? <IconThumbUpFilled /> : <IconThumbUp />}
+            </div>
+            {likeCount}
+          </div> */}
           <Link to={"/" + story.Id} className="flex text-gray-500">
             <div className="hover:cursor-pointer">{<IconMessageCircle />}</div>
             {story.commentCount}

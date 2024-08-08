@@ -14,6 +14,7 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { getUserId, isUserLoggedIn } from "../../helpers/jwtHelper";
 
 const Home = () => {
   const { task, modal, setModal } = useContext(CreateUpdateContext);
@@ -76,18 +77,18 @@ const Home = () => {
       <div className="flex-grow flex flex-col mb-10">
         <div className="flex justify-center py-5 border-b-2 gap-3">
           <Search querySearch={search} />
-          <button
+          {isUserLoggedIn()&&<button
             type="button"
             className="flex justify-center items-center text-white bg-black w-[40px] h-[40px] rounded-full outline-none"
             onClick={handleCreateButton}
           >
             {<IconPlus />}
-          </button>
+          </button>}
         </div>
         <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
           {stories?.stories &&
-            stories.stories.map((story) => (
-              <div className="w-full h-full border">
+            stories.stories.map((story, index) => (
+              <div key = {index} className="w-full h-full border">
                 <Card key={story.Id} story={story} page="HOME" />
               </div>
               //

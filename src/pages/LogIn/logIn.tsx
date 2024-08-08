@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import TextInput from "../../components/TextInput/textInput";
 import Button from "../../components/Button/button";
-import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import {
+  Link,
+  NavigateFunction,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -11,7 +16,9 @@ import { ILogInInput } from "../../interfaces/auth";
 import { ShowError } from "../../components/ShowError/showError";
 import { AxiosError } from "axios";
 
+
 const LogIn: React.FC = () => {
+  const location = useLocation();
   const navigate: NavigateFunction = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
 
@@ -35,9 +42,8 @@ const LogIn: React.FC = () => {
     try {
       const token: string = await logIn(data);
       localStorage.setItem("token", token);
-      navigate("/");
+      navigate(location.state.prev || "/");
     } catch (error) {
-      console.log("in log in error")
       if (error instanceof AxiosError) {
         setErrorMessage(error.response?.data.message);
       } else {
@@ -52,7 +58,7 @@ const LogIn: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-">
         <h1 className="text-4xl font-bold">Log In</h1>
         <form
           className="grid grid-cols-1 place-items-center w-96 py-10 shadow-xl rounded-md"
@@ -97,7 +103,11 @@ const LogIn: React.FC = () => {
             {/* </Link> */}
             <div>
               Don't have an account?&nbsp;
-              <Link to="/Signup" className="font-bold hover:underline">
+              <Link
+                state={location.state.prev}
+                to="/Signup"
+                className="font-bold hover:underline"
+              >
                 Sign Up
               </Link>
             </div>

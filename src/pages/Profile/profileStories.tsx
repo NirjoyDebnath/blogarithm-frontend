@@ -15,6 +15,8 @@ import Pagination from "@mui/material/Pagination";
 import Search from "../../components/Search/search";
 import { IconPlus } from "@tabler/icons-react";
 import { getUserId } from "../../helpers/jwtHelper";
+import Header from "../../components/Header/header";
+import ProfileNavbar from "../../components/Navbar/profileNavbar";
 
 const ProfileStories = () => {
   const [errorMessage, setErrorMessage] = useState<string | false>(false);
@@ -99,6 +101,8 @@ const ProfileStories = () => {
           afterFinish={afterFinish}
         ></ShowError>
       )}
+      <Header/>
+      <ProfileNavbar id={params.id!}/>
       <div className="flex justify-center py-5 border-b-2 gap-3">
         <Search querySearch={search} />
         {(params.id ? params.id === userId : false) && (
@@ -110,10 +114,12 @@ const ProfileStories = () => {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5 ">
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
         {stories?.stories &&
-          stories.stories.map((story) => (
-            <Card key={story.Id} story={story} page="HOME" />
+          stories.stories.map((story, index) => (
+            <div key = {index} className="w-full h-full border">
+                <Card key={story.Id} story={story} page="HOME" />
+              </div>
           ))}
       </div>
       <div className="flex justify-center mb-5 rounded-full">

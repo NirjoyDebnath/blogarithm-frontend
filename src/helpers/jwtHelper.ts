@@ -14,25 +14,28 @@ export const getToken = (): string | null => {
   return token;
 };
 
+export const decodeToken = ():IDecodeToken | null=>{
+  try {
+    const token: string | null = getToken();
+    if(!token) return null;
+    const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
+    return decodedToken;
+  } catch (error) {
+    return null;
+  }
+}
+
 export const getTokenExpire = (): number | null => {
-  const token: string | null = localStorage.getItem("token");
-  if (!token) return null;
+  const decodedToken = decodeToken();
 
-  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
-  if (decodedToken) return decodedToken.exp;
-
-  return null;
+  if(!decodedToken) return null;
+  else return decodedToken.exp;
 };
 
 export const isTokenExpired = (): boolean => {
-  const token: string | null = localStorage.getItem("token");
-  if (!token) return true;
-
-  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
-  if (decodedToken) {
-    return decodedToken.exp < Date.now() / 1000;
-  }
-  return true;
+  const decodedToken = decodeToken();
+  if (decodedToken) return decodedToken.exp < Date.now() / 1000;
+  else return true;
 };
 
 export const isUserLoggedIn = (): boolean => {
@@ -40,34 +43,19 @@ export const isUserLoggedIn = (): boolean => {
 };
 
 export const getUserName = (): string | null => {
-  const token: string | null = localStorage.getItem("token");
-  if (!token) return null;
-
-  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
-  if (decodedToken) {
-    return decodedToken.userName;
-  }
-  return null;
+  const decodedToken = decodeToken();
+  if (decodedToken) return decodedToken.userName;
+  else return null;
 };
 
 export const getUserId = (): string | null => {
-  const token: string | null = localStorage.getItem("token");
-  if (!token) return null;
-
-  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
-  if (decodedToken) {
-    return decodedToken.id;
-  }
-  return null;
+  const decodedToken = decodeToken();
+  if (decodedToken) return decodedToken.id;
+  else return null;
 };
 
 export const getUserRole = (): number | null => {
-  const token: string | null = localStorage.getItem("token");
-  if (!token) return null;
-
-  const decodedToken: IDecodeToken = jwtDecode<IDecodeToken>(token);
-  if (decodedToken) {
-    return decodedToken.role;
-  }
-  return null;
+  const decodedToken = decodeToken();
+  if (decodedToken) return decodedToken.role;
+  else return null;
 };

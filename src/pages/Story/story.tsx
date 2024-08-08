@@ -20,7 +20,8 @@ const Story = () => {
   const params = useParams<{ id: string }>();
   const { task, modal } = useContext(CreateUpdateContext);
   const [story, setStory] = useState<IStory | null>(null);
-  const [comments, setComments] = useState<IComment[] | null>(null);
+  const [comments, setComments] = useState<IComment[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | false>(false);
   useEffect(() => {
     (async () => {
       try {
@@ -39,12 +40,11 @@ const Story = () => {
       }
     })();
   }, []);
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const schema: yup.ObjectSchema<ICommentInfo> = yup.object().shape({
     Comment: yup.string().required("Please Fill"),
   });
 
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -52,16 +52,16 @@ const Story = () => {
     setErrorMessage(false);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [comments]);
 
   const onSubmit: SubmitHandler<ICommentInfo> = async (data: ICommentInfo) => {
     try {
       if (!story) {
         setErrorMessage("No such story");
       } else {
-        commentStory(data, story.Id);
-        //setComments(await getCommentsByStoryId(story.Id));
-        window.location.reload();
+        const comment: IComment = await commentStory(data, story.Id);
+        setComments((prev) => [comment, ...prev]);
+        reset()
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -108,12 +108,15 @@ const Story = () => {
                 </button>
               </form>
               <div className="">
-              {comments?.length?<div className="border-b p-4">Comments</div>:""}
-                
-                {comments && 
-                
+                {comments?.length ? (
+                  <div className="border-b p-4">Comments</div>
+                ) : (
+                  ""
+                )}
+
+                {comments &&
                   comments.map((comment, index) => (
-                    <div key = {index} className="pl-4 border-b">
+                    <div key={index} className="pl-4 border-b">
                       <Link
                         to={`${ENV.FRONTEND_SERVER_ENDPOINT}/user/${story.AuthorId}/profile`}
                         className="mt-1"

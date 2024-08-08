@@ -13,7 +13,6 @@ export interface IStory {
   Title: string;
   Description: string;
   AuthorUserName: string;
-  userLiked: boolean;
   commentCount: number;
   comments?: IComment[];
   likes: ILike[];
