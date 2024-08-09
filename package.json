@@ -16,7 +16,7 @@
     "@mui/material": "^5.16.5",
     "@tabler/icons-react": "^3.11.0",
     "@types/jwt-decode": "^3.1.0",
-    "@types/react-toastify": "^4.1.0",
+    "@types/react-ShowErrorify": "^4.1.0",
     "axios": "^1.7.2",
     "date-fns": "^3.6.0",
     "jspdf": "^2.5.1",

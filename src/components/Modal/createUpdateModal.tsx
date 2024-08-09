@@ -8,13 +8,13 @@ import {
 } from "../../interfaces/story";
 import Button from "../Button/button";
 import * as yup from "yup";
-import { useContext, useState } from "react";
-import { CreateUpdateContext } from "../../contexts/createupdateContext";
+import { useContext } from "react";
+import { CreateUpdateDeleteContext } from "../../contexts/createupdatedeleteContext";
 import { StoryContext } from "../../contexts/storyContext";
 import { getUserId, getUserName } from "../../helpers/jwtHelper";
-import { ShowError } from "../ShowError/showError";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 interface IModal {
   story?: IStory | null;
@@ -23,9 +23,10 @@ interface IModal {
 
 const Modal = ({ story, setStory }: IModal) => {
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
-  const { task, storyId, storyTitle, storyDescription, setModal } =
-    useContext(CreateUpdateContext);
+  const { task, storyId, storyTitle, storyDescription, setCreateUpdateModal } =
+    useContext(CreateUpdateDeleteContext);
+  const { setMessage, setType } =
+    useContext(ErrorSuccessContext);
   const { stories, setStories } = useContext(StoryContext);
   const schema: yup.ObjectSchema<ICreateStoryInput> = yup.object().shape({
     Title: yup.string().max(50, "Title must be under 50 charcter").required(),
@@ -44,7 +45,7 @@ const Modal = ({ story, setStory }: IModal) => {
   };
 
   const onDivClick = () => {
-    setModal(false);
+    setCreateUpdateModal(false);
   };
 
   const {
@@ -63,7 +64,8 @@ const Modal = ({ story, setStory }: IModal) => {
         const AuthorId = getUserId();
         const AuthorUserName = getUserName();
         if (!AuthorId || !AuthorUserName) {
-          setErrorMessage("You are not authorized");
+          setType('error')
+          setMessage("You are not authorized");
         } else {
           const createStoryInfo: ICreateStoryInfo = {
             Title: data.Title,
@@ -71,10 +73,14 @@ const Modal = ({ story, setStory }: IModal) => {
           };
           await createStory(createStoryInfo);
           setStories(await getAllStories());
+          setType('success')
+          setMessage("Your story created successfully");
           navigate("/");
         }
       } else if (task == "UPDATE" && storyId) {
         await updateStory(data, storyId);
+        setType('success')
+        setMessage("Your story updated successfully");
         if (story && setStory) {
           story.Title = data.Title;
           story.Description = data.Description;
@@ -90,29 +96,20 @@ const Modal = ({ story, setStory }: IModal) => {
           setStories(stories);
         }
       }
-      setModal(false);
+      setCreateUpdateModal(false);
     } catch (error) {
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType('error')
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType('error')
+        setMessage("An unexpected error occurred.");
       }
     }
   };
 
-  const afterFinish = () => {
-    setErrorMessage(false);
-  };
-
   return (
     <>
-      {errorMessage && (
-        <ShowError
-          message={errorMessage}
-          time={6000}
-          afterFinish={afterFinish}
-        />
-      )}
       <div
         className="fixed flex h-screen w-screen bg-black bg-opacity-80 items-center justify-center z-20"
         onClick={onDivClick}
@@ -140,14 +137,14 @@ const Modal = ({ story, setStory }: IModal) => {
                 placeholder="Title"
                 className="border border-black w-5/6 h-10 p-2"
                 onKeyDown={handleKeyPress}
-                defaultValue={storyTitle ? storyTitle : ""}
+                defaultValue={task==='UPDATE' ? storyTitle||"" : ""}
                 required
                 {...register("Title")}
               />
               <textarea
                 className="border border-black w-5/6 h-60 p-2"
                 placeholder="Description"
-                defaultValue={storyDescription ? storyDescription : ""}
+                defaultValue={(task==='UPDATE') ? storyDescription||"" : ""}
                 {...register("Description")}
               ></textarea>
               <div className="flex flex-col items-end w-5/6">

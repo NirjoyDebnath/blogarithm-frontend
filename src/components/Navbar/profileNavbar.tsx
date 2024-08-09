@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { isAuthorizedWithToken } from '../../helpers/authHelper'
 
 interface IProfileNavbar{
-  id: string;
+  id: string | undefined;
 }
 
 const ProfileNavbar = ({id}:IProfileNavbar) => {

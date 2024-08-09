@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import TextInput from "../../components/TextInput/textInput";
 import Button from "../../components/Button/button";
 import {
@@ -13,14 +13,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { logIn } from "../../api/authAPI";
 import { ILogInInput } from "../../interfaces/auth";
-import { ShowError } from "../../components/ShowError/showError";
 import { AxiosError } from "axios";
-
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 const LogIn: React.FC = () => {
   const location = useLocation();
   const navigate: NavigateFunction = useNavigate();
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
 
   const schema: yup.ObjectSchema<ILogInInput> = yup.object().shape({
     UserName: yup
@@ -42,35 +41,28 @@ const LogIn: React.FC = () => {
     try {
       const token: string = await logIn(data);
       localStorage.setItem("token", token);
-      navigate(location.state.prev || "/");
+      navigate(location.state || "/");
+      setType("success");
+      setMessage("Logged In Successfull");
     } catch (error) {
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType("error");
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType("error");
+        setMessage("An unexpected error occurred.");
       }
     }
   };
 
-  const afterFinish = () => {
-    setErrorMessage(false);
-  };
-
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-">
+      <div className="flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-4xl font-bold">Log In</h1>
         <form
           className="grid grid-cols-1 place-items-center w-96 py-10 shadow-xl rounded-md"
           onSubmit={handleSubmit(onSubmit)}
         >
-          {errorMessage && (
-            <ShowError
-              message={errorMessage}
-              time={6000}
-              afterFinish={afterFinish}
-            ></ShowError>
-          )}
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Username</label>
@@ -104,7 +96,7 @@ const LogIn: React.FC = () => {
             <div>
               Don't have an account?&nbsp;
               <Link
-                state={location.state.prev}
+                state={location.state || "/"}
                 to="/Signup"
                 className="font-bold hover:underline"
               >

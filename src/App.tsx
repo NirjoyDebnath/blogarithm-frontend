@@ -1,14 +1,14 @@
+import { useContext } from "react";
+import { ShowError } from "./components/Toast/showError";
+import { ErrorSuccessContext } from "./contexts/errorsuccessContext";
 import AppRouter from "./routes/route";
-import CreateUpdateContextProvider from "./contexts/createupdateContext";
-import StoryContextProvider from "./contexts/storyContext";
+import { ShowSuccess } from "./components/Toast/showSuccess";
 function App() {
+  const { message, type } = useContext(ErrorSuccessContext);
   return (
     <>
-      <StoryContextProvider>
-        <CreateUpdateContextProvider>
-          <AppRouter />
-        </CreateUpdateContextProvider>
-      </StoryContextProvider>
+      {message && (type === 'error'? <ShowError></ShowError>:<ShowSuccess></ShowSuccess>)}
+      <AppRouter />
     </>
   );
 }

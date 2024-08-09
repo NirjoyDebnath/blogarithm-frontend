@@ -1,17 +1,17 @@
 import { IconUserFilled } from "@tabler/icons-react";
 import { getUserById } from "../../api/userAPI";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IUser } from "../../interfaces/user";
-import { ShowError } from "../../components/ShowError/showError";
 import { AxiosError } from "axios";
 import ProfileNavbar from "../../components/Navbar/profileNavbar";
 import Header from "../../components/Header/header";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 const Profile = () => {
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
   const params = useParams<{ id: string }>();
   const [user, setUser] = useState<IUser | null>(null);
+  const { setMessage } = useContext(ErrorSuccessContext);
 
   useEffect(() => {
     (async () => {
@@ -20,31 +20,20 @@ const Profile = () => {
           const user = await getUserById(params.id);
           setUser(user);
         } else {
-          setErrorMessage("An unexpected error occurred.");
+          setMessage("An unexpected error occurred.");
         }
       } catch (error) {
         if (error instanceof AxiosError) {
-          setErrorMessage(error.response?.data.message);
+          setMessage(error.response?.data.message);
         } else {
-          setErrorMessage("An unexpected error occurred.");
+          setMessage("An unexpected error occurred.");
         }
       }
     })();
   }, []);
 
-  const afterFinish = () => {
-    setErrorMessage(false);
-  };
-
   return (
     <>
-      {errorMessage && (
-        <ShowError
-          message={errorMessage}
-          time={6000}
-          afterFinish={afterFinish}
-        ></ShowError>
-      )}
       <Header />
 
       <div className="flex-grow min-h-full">

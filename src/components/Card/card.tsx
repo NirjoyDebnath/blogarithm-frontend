@@ -6,14 +6,13 @@ import {
   IconDownload,
   IconDotsVertical,
 } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { likeStory, unlikeStory } from "../../api/likeAPI";
 import { IStory } from "../../interfaces/story";
 import { AxiosError } from "axios";
 import { jsPDF } from "jspdf";
 import { ENV } from "../../config/env";
-import { ShowError } from "../ShowError/showError";
 import { format } from "date-fns";
 import {
   setCreatedAt,
@@ -22,10 +21,9 @@ import {
   setUserName,
   setWebnameandpage,
 } from "../../helpers/jsPDFHelper";
-import { getUserId } from "../../helpers/jwtHelper";
-import Tooltip from "@mui/material/Tooltip";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import { getUserId, isUserLoggedIn } from "../../helpers/jwtHelper";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
+import LogInModal from "../Modal/logIn";
 
 interface IStoryCard {
   story: IStory;
@@ -34,13 +32,16 @@ interface IStoryCard {
 
 const Card = ({ story, page }: IStoryCard) => {
   const userId = getUserId();
+  const likeRef = useRef<HTMLDivElement>(null);
   const [cardMenuShow, setCardMenuShow] = useState<boolean>(false);
-  const [deleted, setdeleted] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const [logInModal, setLogInModal] = useState<boolean>(false);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
   const [liked, setLiked] = useState(
     story.likes.some((like) => like.UserId === userId)
   );
   const [likeCount, setLikeCount] = useState(story.likes.length);
+  const [handle, setHandle] = useState<React.RefObject<HTMLDivElement>>(likeRef);
+
   const cardMenuRef = useRef<HTMLDivElement | null>(null);
 
   const handleThreeDots = () => {
@@ -49,7 +50,12 @@ const Card = ({ story, page }: IStoryCard) => {
 
   const handleLikeStory = async () => {
     try {
-      if (liked) {
+      const userLoggedIn = isUserLoggedIn();
+      if (!userLoggedIn) {
+        setHandle(likeRef);
+        setLogInModal(true);
+      }
+      else if (liked) {
         await unlikeStory(story.Id);
         setLiked(false);
         setLikeCount((prev) => prev - 1);
@@ -60,9 +66,11 @@ const Card = ({ story, page }: IStoryCard) => {
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType("error");
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType("error");
+        setMessage("An unexpected error occurred.");
       }
     }
   };
@@ -91,7 +99,8 @@ const Card = ({ story, page }: IStoryCard) => {
   };
 
   const cutStory = (story: string) => {
-    if (page === "STORY") return story.slice(1);
+    if (story.length <= 200) return story.slice(1, story.length);
+    else if (page === "STORY") return story.slice(1, story.length);
     else return story.length > 200 ? story.slice(1, 200) + "..." : story;
   };
 
@@ -102,24 +111,10 @@ const Card = ({ story, page }: IStoryCard) => {
     };
   }, []);
 
-  const afterFinish = () => {
-    setErrorMessage(false);
-  };
-
   return (
     <>
-      {errorMessage && (
-        <ShowError
-          message={errorMessage}
-          time={6000}
-          afterFinish={afterFinish}
-        ></ShowError>
-      )}
-      <div
-        className={`relative w-full h-full flex flex-col items-start p-4 ${
-          page === "HOME" ? "hover:shadow-md" : ""
-        }  ${deleted ? "pointer-events-none opacity-50" : ""}`}
-      >
+      {logInModal && <LogInModal setLogInModal={setLogInModal} handle={handle}/>}
+      <div className={`relative w-full h-full flex flex-col items-start p-4`}>
         <div className="absolute right-2 top-2 rounded-full" ref={cardMenuRef}>
           <div className="cursor-pointer" onClick={handleThreeDots}>
             <IconDotsVertical />
@@ -132,13 +127,12 @@ const Card = ({ story, page }: IStoryCard) => {
                 storyTitle={story.Title}
                 storyDescription={story.Description}
                 _getHateoas={story._links[0].href}
-                setDeleted={setdeleted}
               />
             )}
           </div>
         </div>
         {page === "HOME" ? (
-          <Link to={"/" + story.Id} className="flex-none">
+          <Link to={"/story/" + story.Id} className="flex-none">
             <h2 className="text-2xl font-bold break-words w-full">
               {story.Title}
             </h2>
@@ -165,38 +159,23 @@ const Card = ({ story, page }: IStoryCard) => {
           <span className="text-xl">{story.Description.charAt(0)}</span>
           {cutStory(story.Description)}
           {story.Description.length > 200 && page === "HOME" && (
-            <Link to={"/" + story.Id} className="font-semibold hover:underline">
+            <Link
+              to={"/story/" + story.Id}
+              className="font-semibold hover:underline"
+            >
               Show More
             </Link>
           )}
         </div>
 
         <div className="flex w-full justify-around pt-3">
-          <Tooltip title={
-          <Box sx={{ p: 1 }}>
-            {[
-  "apple", "banana", "cherry", "date", "elderberry",
-  "fig", "grape", "honeydew", "kiwi", "lemon",
-  "mango", "nectarine", "orange", "papaya", "quince",
-  "raspberry", "strawberry", "tangerine", "ugli", "vanilla",
-  "watermelon", "xigua", "yellowfruit", "zucchini"
-].map((like, index) => (
-              <Typography key={index}>{like}</Typography>
-            ))}</Box>}>
           <div className="flex text-gray-500">
-            <div className="hover:cursor-pointer" onClick={handleLikeStory}>
+            <div ref = {likeRef} className="hover:cursor-pointer" onClick={handleLikeStory}>
               {liked ? <IconThumbUpFilled /> : <IconThumbUp />}
             </div>
             {likeCount}
           </div>
-          </Tooltip>
-          {/* <div className="flex text-gray-500">
-            <div className="hover:cursor-pointer" onClick={handleLikeStory}>
-              {liked ? <IconThumbUpFilled /> : <IconThumbUp />}
-            </div>
-            {likeCount}
-          </div> */}
-          <Link to={"/" + story.Id} className="flex text-gray-500">
+          <Link to={"/story/" + story.Id} className="flex text-gray-500">
             <div className="hover:cursor-pointer">{<IconMessageCircle />}</div>
             {story.commentCount}
           </Link>

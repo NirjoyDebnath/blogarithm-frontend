@@ -1,4 +1,9 @@
-import { Link, NavigateFunction, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  NavigateFunction,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import TextInput from "../../components/TextInput/textInput";
@@ -7,14 +12,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ISignUpInput } from "../../interfaces/auth";
 import { logIn, signUp } from "../../api/authAPI";
-import { useState } from "react";
-import { ShowError } from "../../components/ShowError/showError";
+import { useContext } from "react";
 import { AxiosError } from "axios";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 const SignUp = () => {
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
   const navigate: NavigateFunction = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
 
   const schema: yup.ObjectSchema<ISignUpInput> = yup.object().shape({
     Name: yup
@@ -56,18 +61,18 @@ const SignUp = () => {
       await signUp(data);
       const token: string = await logIn(data);
       localStorage.setItem("token", token);
+      setType("success");
+      setMessage("Sign Up Successful");
       navigate("/");
     } catch (error) {
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType("error");
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType("error");
+        setMessage("An unexpected error occurred.");
       }
     }
-  };
-
-  const afterFinish = () => {
-    setErrorMessage(false);
   };
 
   return (
@@ -79,13 +84,6 @@ const SignUp = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">
-            {errorMessage && (
-              <ShowError
-                message={errorMessage}
-                time={6000}
-                afterFinish={afterFinish}
-              ></ShowError>
-            )}
             <div className="grid grid-cols-1 w-full place-items-start gap-1">
               <label className="font-bold">Name</label>
               <TextInput
@@ -160,7 +158,11 @@ const SignUp = () => {
             />
             <div>
               Already have an account?&nbsp;
-              <Link state={location.state.prev} to="/logIn" className="font-bold hover:underline">
+              <Link
+                state={location.state || "/"}
+                to="/logIn"
+                className="font-bold hover:underline"
+              >
                 Log In
               </Link>
             </div>

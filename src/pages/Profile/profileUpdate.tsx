@@ -1,23 +1,33 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import TextInput from "../../components/TextInput/textInput";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { updatePassword, updateUserById } from "../../api/userAPI";
 import { IUpdatePasswordInput, IUpdateUserInput } from "../../interfaces/user";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
-import { ShowError } from "../../components/ShowError/showError";
 import Header from "../../components/Header/header";
 import ProfileNavbar from "../../components/Navbar/profileNavbar";
-import LogIn from "../../components/Modal/logIn";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
+import { isAuthorizedWithToken } from "../../helpers/authHelper";
 
 const ProfileUpdate = () => {
   const params = useParams<{ id: string }>();
   const [update, setUpdate] = useState<"PROFILE" | "PASSWORD">("PROFILE");
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
+  const navigate = useNavigate()
+
+  useEffect(()=>{
+    const isAuthorized = isAuthorizedWithToken(params.id);
+    if(!isAuthorized){
+      setType('error');
+      setMessage('You are not authorized for this action')
+      navigate('/');
+    }
+  })
 
   const editUserSchema: yup.ObjectSchema<IUpdateUserInput> = yup
     .object()
@@ -77,14 +87,19 @@ const ProfileUpdate = () => {
     try {
       if (params.id) {
         await updateUserById(data, params.id);
+        setType('success')
+        setMessage("Your information has been updated");
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType('error')
+        setMessage("An unexpected error occurred.");
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType('error')
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType('error')
+        setMessage("An unexpected error occurred.");
       }
     }
   };
@@ -94,40 +109,36 @@ const ProfileUpdate = () => {
     try {
       if (params.id) {
         await updatePassword(data, params.id);
+        setType('success')
+        setMessage("Your password has been updated");
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType('error')
+        setMessage("An unexpected error occurred.");
       }
     } catch (error) {
+      setType('error')
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType('error')
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType('error')
+        setMessage("An unexpected error occurred.");
       }
     }
-  };
-
-  const afterFinish = () => {
-    setErrorMessage(false);
   };
 
   const handleEditProfile = () => {
     setUpdate("PROFILE");
   };
+
   const handleUpdatePassword = () => {
     setUpdate("PASSWORD");
   };
+
   return (
     <div className="flex-grow">
-      {errorMessage && (
-        <ShowError
-          message={errorMessage}
-          time={6000}
-          afterFinish={afterFinish}
-        />
-      )}
-      <LogIn/>
-      <Header/>
-      <ProfileNavbar id={params.id!}/>
+      <Header />
+      <ProfileNavbar id={params.id} />
       <div className="flex w-full h-10 bg-gray-800 items-center justify-evenly">
         <div
           className="text-white text-center cursor-pointer"

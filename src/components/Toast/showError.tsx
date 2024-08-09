@@ -1,20 +1,18 @@
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { useContext } from "react";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
-interface ISnackbar {
-  message: string;
-  time: number;
-  afterFinish: () => void;
-}
+export function ShowError() {
+  const { message, setMessage } = useContext(ErrorSuccessContext);
 
-export function ShowError({ message, afterFinish }: ISnackbar) {
   return (
     <div>
       <Snackbar
         open={true}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        autoHideDuration={3000}
-        onClose={afterFinish}
+        autoHideDuration={6000}
+        onClose={() => setMessage(null)}
       >
         <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
           {message}

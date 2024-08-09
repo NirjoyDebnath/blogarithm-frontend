@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { getStoryById } from "../../api/storyAPI";
 import Header from "../../components/Header/header";
 import { IStory } from "../../interfaces/story";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Card from "../../components/Card/card";
-import { CreateUpdateContext } from "../../contexts/createupdateContext";
-import Modal from "../../components/Modal/modal";
+import { CreateUpdateDeleteContext } from "../../contexts/createupdatedeleteContext";
+import CreateUpdateModal from "../../components/Modal/createUpdateModal";
 import { ENV } from "../../config/env";
 import { commentStory, getCommentsByStoryId } from "../../api/commentAPI";
 import * as yup from "yup";
@@ -13,15 +13,26 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { IComment, ICommentInfo } from "../../interfaces/comment";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { AxiosError } from "axios";
-import { ShowError } from "../../components/ShowError/showError";
 import { format } from "date-fns";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
+import DeleteConfirmationModal from "../../components/Modal/deleteModal";
+import { isUserLoggedIn } from "../../helpers/jwtHelper";
+import LogInModal from "../../components/Modal/logIn";
 
 const Story = () => {
   const params = useParams<{ id: string }>();
-  const { task, modal } = useContext(CreateUpdateContext);
+  const { task, createUpdateModal, deleteModal } = useContext(
+    CreateUpdateDeleteContext
+  );
+  const commentRef = useRef<HTMLButtonElement>(null);
   const [story, setStory] = useState<IStory | null>(null);
   const [comments, setComments] = useState<IComment[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
+  const navigate = useNavigate();
+  const [handle, setHandle] =
+    useState<React.RefObject<HTMLButtonElement>>(commentRef);
+  const [logInModal, setLogInModal] = useState<boolean>(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -32,11 +43,9 @@ const Story = () => {
           setStory(null);
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          setErrorMessage(error.response?.data.message);
-        } else {
-          setErrorMessage("An unexpected error occurred.");
-        }
+        setType("error");
+        setMessage("Story doesn't exists");
+        navigate("/");
       }
     })();
   }, []);
@@ -48,39 +57,44 @@ const Story = () => {
     resolver: yupResolver(schema),
   });
 
-  const afterFinish = () => {
-    setErrorMessage(false);
-  };
-
   useEffect(() => {}, [comments]);
 
   const onSubmit: SubmitHandler<ICommentInfo> = async (data: ICommentInfo) => {
     try {
+      const userLoggedIn = isUserLoggedIn();
+      if (!userLoggedIn) {
+        setHandle(commentRef);
+        setLogInModal(true);
+      }
       if (!story) {
-        setErrorMessage("No such story");
+        setType("error");
+        setMessage("No such story");
       } else {
         const comment: IComment = await commentStory(data, story.Id);
         setComments((prev) => [comment, ...prev]);
-        reset()
+        reset();
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        setErrorMessage(error.response?.data.message);
+        setType("error");
+        setMessage(error.response?.data.message);
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setType("error");
+        setMessage("An unexpected error occurred.");
       }
     }
   };
   return (
     <>
-      {modal && task == "UPDATE" && <Modal story={story} setStory={setStory} />}
-      {errorMessage && (
-        <ShowError
-          message={errorMessage}
-          time={6000}
-          afterFinish={afterFinish}
-        ></ShowError>
+      {createUpdateModal && task == "UPDATE" && (
+        <CreateUpdateModal story={story} setStory={setStory} />
       )}
+      {deleteModal && <DeleteConfirmationModal />}
+
+      {logInModal && (
+        <LogInModal setLogInModal={setLogInModal} handle={handle} />
+      )}
+
       <Header />
       <div className="w-full flex-grow flex flex-col items-center">
         <div className="flex flex-col w-full md:w-[750px]">
@@ -101,6 +115,7 @@ const Story = () => {
                   {...register("Comment")}
                 ></textarea>
                 <button
+                  ref={commentRef}
                   type="submit"
                   className={`bg-black text-white px-3 py-2 text-sm font-semibold shadow-sm ${`hover:$bg-black/85`} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all outline-none`}
                 >

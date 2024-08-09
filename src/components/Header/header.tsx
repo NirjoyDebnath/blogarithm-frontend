@@ -36,7 +36,13 @@ const Header = () => {
     <>
       <div className="flex min-h-20 sticky top-0 h-16 bg-gray-100 items-center z-10">
         <Link to="/" className="flex ml-3">
-          <img src="\src\images\logo1.jpg" width="30" height="20" alt="" className="rounded-lg"/>
+          <img
+            src="\src\images\logo1.jpg"
+            width="30"
+            height="20"
+            alt=""
+            className="rounded-lg"
+          />
           <div className="text-2xl text-black font-extrabold font-">
             logarithm
           </div>
@@ -48,7 +54,6 @@ const Header = () => {
                 <div
                   className="p-1 mr-4 bg-gray-400 rounded-full cursor-pointer"
                   onClick={handleIconcUser}
-                  
                 >
                   <IconUserFilled />
                 </div>
@@ -78,7 +83,7 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Link state = {{prev: location}} to="/SignUp" className="mr-3">
+              <Link state={location} to="/SignUp" className="mr-3">
                 <Button
                   type="button"
                   buttonName="Sign Up"
@@ -86,7 +91,11 @@ const Header = () => {
                   textColour="text-white"
                 />
               </Link>
-              <Link state = {{prev: location.pathname+location.search}} to="/LogIn" className="mr-5">
+              <Link
+                state={location.pathname + location.search}
+                to="/LogIn"
+                className="mr-5"
+              >
                 <Button
                   type="button"
                   buttonName="Log In"

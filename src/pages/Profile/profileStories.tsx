@@ -9,7 +9,6 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import Card from "../../components/Card/card";
-import { ShowError } from "../../components/ShowError/showError";
 import { AxiosError } from "axios";
 import Pagination from "@mui/material/Pagination";
 import Search from "../../components/Search/search";
@@ -17,9 +16,10 @@ import { IconPlus } from "@tabler/icons-react";
 import { getUserId } from "../../helpers/jwtHelper";
 import Header from "../../components/Header/header";
 import ProfileNavbar from "../../components/Navbar/profileNavbar";
+import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 const ProfileStories = () => {
-  const [errorMessage, setErrorMessage] = useState<string | false>(false);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
   const params = useParams<{ id: string }>();
   const { stories, setStories } = useContext(StoryContext);
   const navigate: NavigateFunction = useNavigate();
@@ -42,20 +42,20 @@ const ProfileStories = () => {
             );
             setStories(fetch);
           } else {
-            const fetch: IStories = await getStoryByUserId(
-              params.id,
-              page
-            );
+            const fetch: IStories = await getStoryByUserId(params.id, page);
             setStories(fetch);
           }
         } else {
-          setErrorMessage("An unexpected error occurred.");
+          setType('error')
+          setMessage("An unexpected error occurred.");
         }
       } catch (error) {
         if (error instanceof AxiosError) {
-          setErrorMessage(error.response?.data.message);
+          setType('error')
+          setMessage(error.response?.data.message);
         } else {
-          setErrorMessage("An unexpected error occurred.");
+          setType('error')
+          setMessage("An unexpected error occurred.");
         }
       }
     })();
@@ -80,7 +80,8 @@ const ProfileStories = () => {
           setPage(page);
           navigate("?page=" + page + searchQuery);
         } else {
-          setErrorMessage("An unexpected error occurred.");
+          setType('error')
+          setMessage("An unexpected error occurred.");
         }
       } catch (error) {
         console.log("something went wrong");
@@ -88,21 +89,10 @@ const ProfileStories = () => {
     })();
   };
 
-  const afterFinish = () => {
-    setErrorMessage(false);
-  };
-
   return (
     <div className="flex-grow">
-      {errorMessage && (
-        <ShowError
-          message={errorMessage}
-          time={6000}
-          afterFinish={afterFinish}
-        ></ShowError>
-      )}
-      <Header/>
-      <ProfileNavbar id={params.id!}/>
+      <Header />
+      <ProfileNavbar id={params.id!} />
       <div className="flex justify-center py-5 border-b-2 gap-3">
         <Search querySearch={search} />
         {(params.id ? params.id === userId : false) && (
@@ -117,9 +107,9 @@ const ProfileStories = () => {
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
         {stories?.stories &&
           stories.stories.map((story, index) => (
-            <div key = {index} className="w-full h-full border">
-                <Card key={story.Id} story={story} page="HOME" />
-              </div>
+            <div key={index} className="w-full h-full border">
+              <Card key={story.Id} story={story} page="HOME" />
+            </div>
           ))}
       </div>
       <div className="flex justify-center mb-5 rounded-full">

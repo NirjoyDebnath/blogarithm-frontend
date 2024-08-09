@@ -15,7 +15,7 @@ export const StoryContext = createContext<IStoryContext>({
   setStories: () => null,
 });
 
-const CreateUpdateContextProvider = ({
+const StoryContextProvider = ({
   children,
 }: {
   children: React.ReactNode;
@@ -36,4 +36,4 @@ const CreateUpdateContextProvider = ({
   );
 };
 
-export default CreateUpdateContextProvider;
+export default StoryContextProvider;
