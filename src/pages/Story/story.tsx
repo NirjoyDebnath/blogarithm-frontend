@@ -15,9 +15,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { AxiosError } from "axios";
 import { format } from "date-fns";
 import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
-import DeleteConfirmationModal from "../../components/Modal/deleteModal";
+import DeleteConfirmationModal from "../../components/Modal/deleteStoryModal";
 import { isUserLoggedIn } from "../../helpers/jwtHelper";
 import LogInModal from "../../components/Modal/logIn";
+import SignUpModal from "../../components/Modal/signUp";
 
 const Story = () => {
   const params = useParams<{ id: string }>();
@@ -32,6 +33,7 @@ const Story = () => {
   const [handle, setHandle] =
     useState<React.RefObject<HTMLButtonElement>>(commentRef);
   const [logInModal, setLogInModal] = useState<boolean>(false);
+  const [signUpModal, setSignUpModal] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -63,10 +65,12 @@ const Story = () => {
     try {
       const userLoggedIn = isUserLoggedIn();
       if (!userLoggedIn) {
+        setType("error");
+        setMessage("Please log in or sign up to like this story");
         setHandle(commentRef);
         setLogInModal(true);
       }
-      if (!story) {
+      else if (!story) {
         setType("error");
         setMessage("No such story");
       } else {
@@ -91,9 +95,9 @@ const Story = () => {
       )}
       {deleteModal && <DeleteConfirmationModal />}
 
-      {logInModal && (
-        <LogInModal setLogInModal={setLogInModal} handle={handle} />
-      )}
+      
+      {logInModal && <LogInModal setSignUpModal={setSignUpModal} setLogInModal={setLogInModal} handle={handle}/>}
+      {signUpModal && <SignUpModal setSignUpModal={setSignUpModal} setLogInModal={setLogInModal} handle={handle}/>}
 
       <Header />
       <div className="w-full flex-grow flex flex-col items-center">
@@ -131,9 +135,9 @@ const Story = () => {
 
                 {comments &&
                   comments.map((comment, index) => (
-                    <div key={index} className="pl-4 border-b">
+                    <div key={index} className="pl-4 border-b bg-gra">
                       <Link
-                        to={`${ENV.FRONTEND_SERVER_ENDPOINT}/user/${story.AuthorId}/profile`}
+                        to={`${ENV.FRONTEND_SERVER_ENDPOINT}/user/${comment.UserId}/profile`}
                         className="mt-1"
                       >
                         <p className="text-sm text-gray-500 hover:underline pb-1">

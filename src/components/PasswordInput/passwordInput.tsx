@@ -35,7 +35,7 @@ const PasswordInput = ({
   return (
     <div className="flex justify-between w-full rounded-md border border-black focus-within:ring-2 focus-within:ring-black focus-within:border-none">
       <input
-        className="w-full h-10 rounded-md bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:border-none"
+        className="w-full h-10 rounded-l-md bg-white px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:border-none"
         type={passwordShow.type}
         placeholder={placeHolder}
         {...register(registerName)}
@@ -43,7 +43,7 @@ const PasswordInput = ({
       ></input>
       <button
         type="button"
-        className="border-l-2 px-2"
+        className="border-l-2 px-2 bg-white rounded-r-md"
         onClick={handleSetPasswordShow}
       >
         {passwordShow.icon}

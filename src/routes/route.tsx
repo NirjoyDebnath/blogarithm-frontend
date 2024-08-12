@@ -6,7 +6,6 @@ import Home from "../pages/Home/home";
 import Story from "../pages/Story/story";
 import Profile from "../pages/Profile/profile";
 import ProfileStories from "../pages/Profile/profileStories";
-import ProfileUpdate from "../pages/Profile/profileUpdate";
 import CreateUpdateDeleteContextProvider from ".././contexts/createupdatedeleteContext";
 import StoryContextProvider from ".././contexts/storyContext";
 
@@ -29,15 +28,7 @@ const AppRouter = () => (
         <Route path="story/:id" element={<Story />} />
         <Route path="user/:id/profile" element={<Profile />} />
         <Route path="user/:id/stories" element={<ProfileStories />} />
-        <Route path="user/:id/update" element={<ProfileUpdate />} />
       </Route>
-      {/* <Route path="/" element={<HomeLayout />}>
-        <Route index element={<Home />} />
-        <Route path=":id" element={<Story />} />
-        <Route path="user/:id/profile" element={<Profile />} />
-        <Route path="user/:id/stories" element={<ProfileStories />} />
-        <Route path="user/:id/update" element={<ProfileUpdate />} />
-      </Route> */}
     </Routes>
   </BrowserRouter>
 );

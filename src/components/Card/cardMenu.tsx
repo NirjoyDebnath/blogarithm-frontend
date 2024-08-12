@@ -15,7 +15,6 @@ const CardMenu = ({
   storyId,
   storyTitle,
   storyDescription,
-  _getHateoas,
 }: ICardMenu) => {
   const {
     setCreateUpdateModal,
@@ -44,7 +43,7 @@ const CardMenu = ({
 
   const handleCopyLink = () => {
     try {
-      navigator.clipboard.writeText(_getHateoas);
+      navigator.clipboard.writeText(window.location.toString());
       alert("Text copied to clipboard");
     } catch (err) {
       alert("Failed to copy text");

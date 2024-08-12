@@ -15,13 +15,18 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { isUserLoggedIn } from "../../helpers/jwtHelper";
-import DeleteConfirmationModal from "../../components/Modal/deleteModal";
+import DeleteConfirmationModal from "../../components/Modal/deleteStoryModal";
 import { AxiosError } from "axios";
 import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 const Home = () => {
-  const { task, setTask, createUpdateModal, setCreateUpdateModal, deleteModal } =
-    useContext(CreateUpdateDeleteContext);
+  const {
+    task,
+    setTask,
+    createUpdateModal,
+    setCreateUpdateModal,
+    deleteModal,
+  } = useContext(CreateUpdateDeleteContext);
   const { stories, setStories } = useContext(StoryContext);
   const [searchParams] = useSearchParams();
   const querySearch = searchParams.get("search");
@@ -43,10 +48,10 @@ const Home = () => {
         }
       } catch (error) {
         if (error instanceof AxiosError) {
-          setType('error')
+          setType("error");
           setMessage(error.response?.data.message);
         } else {
-          setType('error')
+          setType("error");
           setMessage("An unexpected error occurred.");
         }
       }
@@ -62,7 +67,7 @@ const Home = () => {
   }, [queryPage]);
 
   const handleCreateButton = () => {
-    setTask("CREATE")
+    setTask("CREATE");
     setCreateUpdateModal(true);
   };
 
@@ -84,8 +89,8 @@ const Home = () => {
       {deleteModal && <DeleteConfirmationModal />}
 
       <Header />
-      <div className="flex-grow flex flex-col mb-10">
-        <div className="flex justify-center py-5 border-b-2 gap-3">
+      <div className="flex-grow flex flex-col pb-10 bg-gray-200">
+        <div className="flex justify-center py-5 border-b-2 gap-3 bg-gray-100">
           <Search querySearch={search} />
           {isUserLoggedIn() && (
             <button

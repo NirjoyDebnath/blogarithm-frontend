@@ -2,35 +2,17 @@ import { Link, useLocation } from "react-router-dom";
 import Button from "../Button/button";
 import { getUserId, isUserLoggedIn } from "../../helpers/jwtHelper";
 import { IconUserFilled } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 const Header = () => {
   const location = useLocation();
   const userLoggedIn = isUserLoggedIn();
-  const [dropDown, setDropDown] = useState(false);
   const divRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.reload();
   };
-
-  const handleIconcUser = () => {
-    setDropDown((prev) => !prev);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (divRef.current && !divRef.current.contains(event.target as Node)) {
-      setDropDown(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <>
@@ -51,24 +33,12 @@ const Header = () => {
           {userLoggedIn ? (
             <>
               <div className="flex flex-col mt-1" ref={divRef}>
-                <div
-                  className="p-1 mr-4 bg-gray-400 rounded-full cursor-pointer"
-                  onClick={handleIconcUser}
+                <Link
+                  to={`/user/${getUserId()}/profile`}
+                  className="block mr-4 p-1 text-gray-800 bg-gray-400 rounded-full"
                 >
                   <IconUserFilled />
-                </div>
-
-                {dropDown && (
-                  <div className="absolute right-0 top-16 mt-2 w-48 bg-white border border-gray-300 shadow-lg">
-                    <div className="absolute -top-2 right-28 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-white"></div>
-                    <Link
-                      to={`/user/${getUserId()}/profile`}
-                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                    >
-                      Profile
-                    </Link>
-                  </div>
-                )}
+                </Link>
               </div>
 
               <div className="mr-3">

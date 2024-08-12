@@ -14,6 +14,8 @@ export interface IUpdatePasswordInput {
   NewPassword: string;
   NewPasswordAgain: string;
 }
+
+
 export interface IUpdatePasswordInfo {
   CurrentPassword: string;
   NewPassword: string;

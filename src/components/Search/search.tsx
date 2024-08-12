@@ -16,7 +16,7 @@ const Search = ({ querySearch }: ISearch) => {
   return (
     <form className="flex rounded-md border border-black focus-within:ring-1 focus-within:ring-black focus-within:border-none w-[250px] sm:w-1/2">
       <input
-        className="w-full h-10 rounded-md bg-transparent px-3 py-2 text-sm outline-none placeholder:text-gray-600 focus:outline-none focus:border-none"
+        className="w-full h-10 rounded-md bg-white px-3 py-2 text-sm outline-none placeholder:text-gray-600 focus:outline-none focus:border-none"
         type="text"
         placeholder="Search..."
         value={search}

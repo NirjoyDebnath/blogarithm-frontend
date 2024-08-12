@@ -24,6 +24,7 @@ import {
 import { getUserId, isUserLoggedIn } from "../../helpers/jwtHelper";
 import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 import LogInModal from "../Modal/logIn";
+import SignUpModal from "../Modal/signUp";
 
 interface IStoryCard {
   story: IStory;
@@ -35,6 +36,7 @@ const Card = ({ story, page }: IStoryCard) => {
   const likeRef = useRef<HTMLDivElement>(null);
   const [cardMenuShow, setCardMenuShow] = useState<boolean>(false);
   const [logInModal, setLogInModal] = useState<boolean>(false);
+  const [signUpModal, setSignUpModal] = useState<boolean>(false);
   const { setMessage, setType } = useContext(ErrorSuccessContext);
   const [liked, setLiked] = useState(
     story.likes.some((like) => like.UserId === userId)
@@ -52,6 +54,8 @@ const Card = ({ story, page }: IStoryCard) => {
     try {
       const userLoggedIn = isUserLoggedIn();
       if (!userLoggedIn) {
+        setType("error");
+        setMessage("Please log in or sign up to like this story");
         setHandle(likeRef);
         setLogInModal(true);
       }
@@ -113,8 +117,9 @@ const Card = ({ story, page }: IStoryCard) => {
 
   return (
     <>
-      {logInModal && <LogInModal setLogInModal={setLogInModal} handle={handle}/>}
-      <div className={`relative w-full h-full flex flex-col items-start p-4`}>
+      {logInModal && <LogInModal setSignUpModal={setSignUpModal} setLogInModal={setLogInModal} handle={handle}/>}
+      {signUpModal && <SignUpModal setSignUpModal={setSignUpModal} setLogInModal={setLogInModal} handle={handle}/>}
+      <div className={`relative w-full h-full flex flex-col items-start p-4 bg-white ${page === "HOME" && "shadow-md hover:shadow-xl"}`}>
         <div className="absolute right-2 top-2 rounded-full" ref={cardMenuRef}>
           <div className="cursor-pointer" onClick={handleThreeDots}>
             <IconDotsVertical />

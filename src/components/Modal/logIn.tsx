@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import TextInput from "../../components/TextInput/textInput";
 import Button from "../../components/Button/button";
-import { Link } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,11 +12,12 @@ import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 
 interface ILogInModal {
   setLogInModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setSignUpModal: React.Dispatch<React.SetStateAction<boolean>>;
   handle: React.RefObject<HTMLDivElement | HTMLButtonElement | undefined>;
 }
 
-const LogInModal = ({ setLogInModal, handle }: ILogInModal) => {
-  const { setMessage } = useContext(ErrorSuccessContext);
+const LogInModal = ({ setLogInModal, setSignUpModal, handle }: ILogInModal) => {
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
 
   const schema: yup.ObjectSchema<ILogInInput> = yup.object().shape({
     UserName: yup
@@ -41,11 +41,13 @@ const LogInModal = ({ setLogInModal, handle }: ILogInModal) => {
       localStorage.setItem("token", token);
       handle.current?.click();
       window.location.reload();
-      setLogInModal(false);
+      console.log("hello");
     } catch (error) {
       if (error instanceof AxiosError) {
+        setType("error");
         setMessage(error.response?.data.message);
       } else {
+        setType("error");
         setMessage("An unexpected error occurred.");
       }
     }
@@ -55,13 +57,18 @@ const LogInModal = ({ setLogInModal, handle }: ILogInModal) => {
     setLogInModal(false);
   };
 
+  const handleSignUp = () => {
+    setSignUpModal(true);
+    setLogInModal(false);
+  };
+
   return (
     <div
       className="fixed inset-0 flex h-screen w-screen bg-black bg-opacity-80 items-center justify-center z-20"
       onClick={onDivClick}
     >
       <div
-        className="absolute flex flex-col items-center min-w-[350px] w-1/3 h-2/3 bg-white rounded-lg"
+        className="absolute flex flex-col items-center min-w-[350px] w-1/3 bg-white rounded-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <h1 className="text-4xl font-bold pt-10">Log In</h1>
@@ -99,11 +106,14 @@ const LogInModal = ({ setLogInModal, handle }: ILogInModal) => {
               textColour="text-white"
             />
             {/* </Link> */}
-            <div>
+            <div className="flex">
               Don't have an account?&nbsp;
-              <Link to="/Signup" className="font-bold hover:underline">
+              <div
+                onClick={handleSignUp}
+                className="font-bold hover:underline cursor-pointer"
+              >
                 Sign Up
-              </Link>
+              </div>
             </div>
           </div>
         </form>

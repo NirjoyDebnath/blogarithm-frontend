@@ -90,10 +90,10 @@ const ProfileStories = () => {
   };
 
   return (
-    <div className="flex-grow">
+    <div className="flex-grow bg-gray-300">
       <Header />
       <ProfileNavbar id={params.id!} />
-      <div className="flex justify-center py-5 border-b-2 gap-3">
+      <div className="flex justify-center py-5 border-b-2 gap-3 bg-gray-100">
         <Search querySearch={search} />
         {(params.id ? params.id === userId : false) && (
           <button
