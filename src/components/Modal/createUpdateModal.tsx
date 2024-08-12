@@ -29,7 +29,7 @@ const Modal = ({ story, setStory }: IModal) => {
     useContext(ErrorSuccessContext);
   const { stories, setStories } = useContext(StoryContext);
   const schema: yup.ObjectSchema<ICreateStoryInput> = yup.object().shape({
-    Title: yup.string().max(50, "Title must be under 50 charcter").required(),
+    Title: yup.string().max(100, "Title must be under 100 charcter").required(),
     Description: yup
       .string()
       .min(10, "Description must be atleast 10 charcter")

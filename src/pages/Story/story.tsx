@@ -59,8 +59,6 @@ const Story = () => {
     resolver: yupResolver(schema),
   });
 
-  useEffect(() => {}, [comments]);
-
   const onSubmit: SubmitHandler<ICommentInfo> = async (data: ICommentInfo) => {
     try {
       const userLoggedIn = isUserLoggedIn();
@@ -69,13 +67,18 @@ const Story = () => {
         setMessage("Please log in or sign up to like this story");
         setHandle(commentRef);
         setLogInModal(true);
-      }
-      else if (!story) {
+      } else if (!story) {
         setType("error");
         setMessage("No such story");
       } else {
         const comment: IComment = await commentStory(data, story.Id);
         setComments((prev) => [comment, ...prev]);
+        setStory((prev) => {
+          if(prev){
+            return {...prev,commentCount:prev.commentCount+1};
+          }
+          else return prev;
+        });
         reset();
       }
     } catch (error) {
@@ -95,9 +98,20 @@ const Story = () => {
       )}
       {deleteModal && <DeleteConfirmationModal />}
 
-      
-      {logInModal && <LogInModal setSignUpModal={setSignUpModal} setLogInModal={setLogInModal} handle={handle}/>}
-      {signUpModal && <SignUpModal setSignUpModal={setSignUpModal} setLogInModal={setLogInModal} handle={handle}/>}
+      {logInModal && (
+        <LogInModal
+          setSignUpModal={setSignUpModal}
+          setLogInModal={setLogInModal}
+          handle={handle}
+        />
+      )}
+      {signUpModal && (
+        <SignUpModal
+          setSignUpModal={setSignUpModal}
+          setLogInModal={setLogInModal}
+          handle={handle}
+        />
+      )}
 
       <Header />
       <div className="w-full flex-grow flex flex-col items-center">
@@ -135,10 +149,10 @@ const Story = () => {
 
                 {comments &&
                   comments.map((comment, index) => (
-                    <div key={index} className="pl-4 border-b bg-gra">
+                    <div key={index} className="pl-4 border-b">
                       <Link
                         to={`/${ENV.FRONTEND_SERVER_ENDPOINT}/user/${comment.UserId}/profile`}
-                        className="mt-1"
+                        className="mt-1 w-fit"
                       >
                         <p className="text-sm text-gray-500 hover:underline pb-1">
                           @{comment.UserName}

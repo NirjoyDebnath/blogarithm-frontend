@@ -23,13 +23,13 @@ const SignUpModal = ({ setSignUpModal, setLogInModal, handle }: ISignUpModal) =>
     Name: yup
       .string()
       .matches(/^[a-zA-Z.\s]*$/, "Name can not contain special character")
-      .max(50, "Name must be under 15 charcter")
+      .max(30, "Name must be under 30 charcter")
       .required(),
     Email: yup.string().email("Provide a valid email").required(),
     UserName: yup
       .string()
       .matches(/^[a-zA-Z0-9]*$/, "Username can not contain special character")
-      .max(15, "Username must be under 15 charcter")
+      .max(20, "Username must be under 20 charcter")
       .required(),
     Password: yup
       .string()
