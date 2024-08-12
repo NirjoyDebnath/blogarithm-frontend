@@ -12,7 +12,6 @@ import { likeStory, unlikeStory } from "../../api/likeAPI";
 import { IStory } from "../../interfaces/story";
 import { AxiosError } from "axios";
 import { jsPDF } from "jspdf";
-import { ENV } from "../../config/env";
 import { format } from "date-fns";
 import {
   setCreatedAt,
