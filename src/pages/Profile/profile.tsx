@@ -9,7 +9,7 @@ import {
   IUpdateUserInput,
   IUser,
 } from "../../interfaces/user";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
@@ -19,6 +19,8 @@ import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 import { isAuthorizedWithToken } from "../../helpers/authHelper";
 import { IconUserFilled } from "@tabler/icons-react";
 import DeleteConfirmationModal from "../../components/Modal/deleteUserModal";
+import { logIn } from "../../api/authAPI";
+import { getUserName } from "../../helpers/jwtHelper";
 
 const Profile = () => {
   const params = useParams<{ id: string }>();
@@ -48,7 +50,7 @@ const Profile = () => {
         }
       }
     })();
-  }, [params.id]);
+  }, [params.id, state]);
 
   const editUserSchema: yup.ObjectSchema<IUpdateUserInput> = yup
     .object()
@@ -108,6 +110,7 @@ const Profile = () => {
     try {
       if (params.id) {
         await updateUserById(data, params.id);
+        setState("PROFILE")
         setType("success");
         setMessage("Your profile has been updated");
       } else {
@@ -130,6 +133,9 @@ const Profile = () => {
     try {
       if (params.id) {
         await updatePassword(data, params.id);
+        const token = await logIn({UserName: getUserName()!,Password:data.NewPassword})
+        localStorage.setItem("token", token);
+        setState("PROFILE")
         setType("success");
         setMessage("Your password has been updated");
       } else {
@@ -139,10 +145,8 @@ const Profile = () => {
     } catch (error) {
       setType("error");
       if (error instanceof AxiosError) {
-        setType("error");
         setMessage(error.response?.data.message);
       } else {
-        setType("error");
         setMessage("An unexpected error occurred.");
       }
     }
@@ -246,6 +250,7 @@ const Profile = () => {
                     placeHolder="Name"
                     register={editUserRegister}
                     registerName="Name"
+                    defaultValue={user?.Name}
                   />
                   <p className="text-authWarning text-red-400">
                     {editUserErrors.Name?.message}
@@ -258,6 +263,7 @@ const Profile = () => {
                     placeHolder="Email"
                     register={editUserRegister}
                     registerName="Email"
+                    defaultValue={user?.Email}
                   />
                   <p className="text-authWarning text-red-400">
                     {editUserErrors.Email?.message}

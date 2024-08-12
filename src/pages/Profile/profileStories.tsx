@@ -46,15 +46,15 @@ const ProfileStories = () => {
             setStories(fetch);
           }
         } else {
-          setType('error')
+          setType("error");
           setMessage("An unexpected error occurred.");
         }
       } catch (error) {
         if (error instanceof AxiosError) {
-          setType('error')
+          setType("error");
           setMessage(error.response?.data.message);
         } else {
-          setType('error')
+          setType("error");
           setMessage("An unexpected error occurred.");
         }
       }
@@ -80,11 +80,16 @@ const ProfileStories = () => {
           setPage(page);
           navigate("?page=" + page + searchQuery);
         } else {
-          setType('error')
+          setType("error");
           setMessage("An unexpected error occurred.");
         }
       } catch (error) {
-        console.log("something went wrong");
+        setType("error");
+        if (error instanceof AxiosError) {
+          setMessage(error.response?.data.message);
+        } else {
+          setMessage("An unexpected error occurred.");
+        }
       }
     })();
   };

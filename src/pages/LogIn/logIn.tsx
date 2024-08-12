@@ -24,12 +24,9 @@ const LogIn: React.FC = () => {
   const schema: yup.ObjectSchema<ILogInInput> = yup.object().shape({
     UserName: yup
       .string()
-      .matches(/^[a-zA-Z0-9]*$/, "Username can not contain special character")
-      .max(15, "Username must be under 15 charcter")
       .required(),
     Password: yup
       .string()
-      .max(30, "Password must be under 30 charcter")
       .required(),
   });
 
