@@ -62,6 +62,7 @@ const SignUpModal = ({ setSignUpModal, setLogInModal, handle }: ISignUpModal) =>
       setType("success");
       setMessage("Sign Up Successful");
       handle.current?.click();
+      window.location.reload();
     } catch (error) {
       if (error instanceof AxiosError) {
         setType("error");

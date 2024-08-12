@@ -64,7 +64,7 @@ const Story = () => {
       const userLoggedIn = isUserLoggedIn();
       if (!userLoggedIn) {
         setType("error");
-        setMessage("Please log in or sign up to like this story");
+        setMessage("Please log in or sign up to comment");
         setHandle(commentRef);
         setLogInModal(true);
       } else if (!story) {
