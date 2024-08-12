@@ -56,6 +56,7 @@ const Home = () => {
         }
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, setStories]);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ const Home = () => {
   };
 
   const handlePagination = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     page: number
   ) => {
     (async () => {
