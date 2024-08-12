@@ -9,7 +9,7 @@ import {
   IUpdateUserInput,
   IUser,
 } from "../../interfaces/user";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import Button from "../../components/Button/button";
 import PasswordInput from "../../components/PasswordInput/passwordInput";
@@ -31,7 +31,7 @@ const Profile = () => {
   >("PROFILE");
   const { setMessage, setType } = useContext(ErrorSuccessContext);
   const authorized = isAuthorizedWithToken(params.id);
-  
+  const navigate = useNavigate()
 
   useEffect(() => {
     (async () => {
@@ -40,14 +40,18 @@ const Profile = () => {
           const user = await getUserById(params.id);
           setUser(user);
         } else {
+          setType("error");
           setMessage("An unexpected error occurred.");
+          navigate("/");
         }
       } catch (error) {
+        setType("error");
         if (error instanceof AxiosError) {
           setMessage(error.response?.data.message);
         } else {
           setMessage("An unexpected error occurred.");
         }
+        navigate("/");
       }
     })();
   }, [params.id, state]);
@@ -110,7 +114,7 @@ const Profile = () => {
     try {
       if (params.id) {
         await updateUserById(data, params.id);
-        setState("PROFILE")
+        setState("PROFILE");
         setType("success");
         setMessage("Your profile has been updated");
       } else {
@@ -133,9 +137,12 @@ const Profile = () => {
     try {
       if (params.id) {
         await updatePassword(data, params.id);
-        const token = await logIn({UserName: getUserName()!,Password:data.NewPassword})
+        const token = await logIn({
+          UserName: getUserName()!,
+          Password: data.NewPassword,
+        });
         localStorage.setItem("token", token);
-        setState("PROFILE")
+        setState("PROFILE");
         setType("success");
         setMessage("Your password has been updated");
       } else {
@@ -166,7 +173,6 @@ const Profile = () => {
 
   const handleDelete = () => {
     setDeleteModal(true);
-    setState("DELETE");
   };
 
   return (
@@ -206,11 +212,11 @@ const Profile = () => {
             )}
           </div>
         </div>
-        <div className="flex-grow bg-gray-300">
+        <div className="flex-grow bg-gray-200">
           {state === "PROFILE" &&
-            (user ? (
+            (user && (
               <>
-                <div className="flex flex-col items-center w-full h-full shadow-lg bg-gray-300">
+                <div className="flex flex-col items-center w-full h-full shadow-lg bg-gray-200">
                   <div className="min-w-52 min-h-52 p-5">
                     <IconUserFilled className="w-full h-full rounded-full bg-gray-800 text-white" />
                   </div>
@@ -226,17 +232,7 @@ const Profile = () => {
                   </div>
                 </div>
               </>
-            ) : (
-              <div className="flex flex-col items-center w-full shadow-lg bg-gray-100">
-                <div className="min-w-52 min-h-52 p-5">
-                  <IconUserFilled className="w-full h-full rounded-full bg-gray-800 text-white" />
-                </div>
-
-                <div className="flex justify-center m-5">
-                  <h1 className="text-4xl font-bold">User Not Found</h1>
-                </div>
-              </div>
-            ))}
+            ) )}
           {state === "EDITPROFILE" && (
             <div className="p-5">
               <form
@@ -307,9 +303,9 @@ const Profile = () => {
                   </p>
                 </div>
                 <div className="grid grid-cols-1 w-full place-items-start gap-1">
-                  <label className="font-bold">New Password</label>
+                  <label className="font-bold">Confirm Password</label>
                   <PasswordInput
-                    placeHolder="New Password"
+                    placeHolder="Confirm Password"
                     register={updatePasswordRegister}
                     registerName="NewPasswordAgain"
                   />
@@ -329,7 +325,10 @@ const Profile = () => {
 
           {deleteModal && (
             <div className="p-5">
-              <DeleteConfirmationModal id = {params.id} setDeleteModal={setDeleteModal}/>
+              <DeleteConfirmationModal
+                id={params.id}
+                setDeleteModal={setDeleteModal}
+              />
             </div>
           )}
         </div>

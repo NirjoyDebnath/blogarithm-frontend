@@ -148,7 +148,7 @@ const Card = ({ story, page }: IStoryCard) => {
           </h2>
         )}
         <Link
-          to={`/${ENV.FRONTEND_SERVER_ENDPOINT}/user/${story.AuthorId}/profile`}
+          to={`/user/${story.AuthorId}/profile`}
           className="mt-1"
         >
           <p className="text-sm font-semibold text-gray-600 hover:underline mb-1">

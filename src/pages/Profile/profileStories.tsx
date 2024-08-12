@@ -95,7 +95,7 @@ const ProfileStories = () => {
   };
 
   return (
-    <div className="flex-grow bg-gray-300">
+    <div className="flex-grow bg-gray-200">
       <Header />
       <ProfileNavbar id={params.id!} />
       <div className="flex justify-center py-5 border-b-2 gap-3 bg-gray-100">

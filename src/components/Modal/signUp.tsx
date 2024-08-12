@@ -93,7 +93,7 @@ const SignUpModal = ({ setSignUpModal, setLogInModal, handle }: ISignUpModal) =>
       >
         <h1 className="text-4xl font-bold pt-10">Sign Up</h1>
         <form
-          className="grid grid-cols-1 place-items-center w-96 py-10 shadow-xl rounded-md"
+          className="grid grid-cols-1 place-items-center w-96 py-10 rounded-md"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="grid place-items-end gap-y-5 w-4/5 bg-white">

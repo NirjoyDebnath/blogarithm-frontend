@@ -149,12 +149,12 @@ const Story = () => {
 
                 {comments &&
                   comments.map((comment, index) => (
-                    <div key={index} className="pl-4 border-b">
+                    <div key={index} className="flex flex-col pl-4 border-b items-start">
                       <Link
                         to={`/${ENV.FRONTEND_SERVER_ENDPOINT}/user/${comment.UserId}/profile`}
-                        className="mt-1 w-fit"
+                        className="mt-1"
                       >
-                        <p className="text-sm text-gray-500 hover:underline pb-1">
+                        <p className="text-sm font-semibold text-gray-600 hover:underline mb-1">
                           @{comment.UserName}
                         </p>
                       </Link>
@@ -170,7 +170,7 @@ const Story = () => {
               </div>
             </>
           ) : (
-            "no story found"
+            ""
           )}
         </div>
       </div>
