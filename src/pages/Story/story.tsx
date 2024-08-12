@@ -137,7 +137,7 @@ const Story = () => {
                   comments.map((comment, index) => (
                     <div key={index} className="pl-4 border-b bg-gra">
                       <Link
-                        to={`${ENV.FRONTEND_SERVER_ENDPOINT}/user/${comment.UserId}/profile`}
+                        to={`/${ENV.FRONTEND_SERVER_ENDPOINT}/user/${comment.UserId}/profile`}
                         className="mt-1"
                       >
                         <p className="text-sm text-gray-500 hover:underline pb-1">
