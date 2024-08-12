@@ -19,7 +19,7 @@ const Header = () => {
       <div className="flex min-h-20 sticky top-0 h-16 bg-gray-100 items-center z-10">
         <Link to="/" className="flex ml-3">
           <img
-            src="\src\images\logo1.jpg"
+            src="\images\logo1.jpg"
             width="30"
             height="20"
             alt=""
