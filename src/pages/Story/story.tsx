@@ -74,10 +74,9 @@ const Story = () => {
         const comment: IComment = await commentStory(data, story.Id);
         setComments((prev) => [comment, ...prev]);
         setStory((prev) => {
-          if(prev){
-            return {...prev,commentCount:prev.commentCount+1};
-          }
-          else return prev;
+          if (prev) {
+            return { ...prev, commentCount: prev.commentCount + 1 };
+          } else return prev;
         });
         reset();
       }
@@ -94,7 +93,7 @@ const Story = () => {
   return (
     <>
       {createUpdateModal && task == "UPDATE" && (
-        <CreateUpdateModal story={story} setStory={setStory} />
+        <CreateUpdateModal story={story} setStory={setStory} page="HOME" />
       )}
       {deleteModal && <DeleteConfirmationModal />}
 
@@ -149,7 +148,10 @@ const Story = () => {
 
                 {comments &&
                   comments.map((comment, index) => (
-                    <div key={index} className="flex flex-col pl-4 border-b items-start">
+                    <div
+                      key={index}
+                      className="flex flex-col pl-4 border-b items-start"
+                    >
                       <Link
                         to={`/${ENV.FRONTEND_SERVER_ENDPOINT}/user/${comment.UserId}/profile`}
                         className="mt-1"
