@@ -18,6 +18,7 @@ import { isUserLoggedIn } from "../../helpers/jwtHelper";
 import DeleteConfirmationModal from "../../components/Modal/deleteStoryModal";
 import { AxiosError } from "axios";
 import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
+import StorySkeletonLoader from "../../components/SkeletonLoader/storySkeletonLoader";
 
 const Home = () => {
   const {
@@ -27,7 +28,7 @@ const Home = () => {
     setCreateUpdateModal,
     deleteModal,
   } = useContext(CreateUpdateDeleteContext);
-  const { stories, setStories } = useContext(StoryContext);
+  const { stories, setStories, reset } = useContext(StoryContext);
   const [searchParams] = useSearchParams();
   const querySearch = searchParams.get("search");
   const queryPage = searchParams.get("page");
@@ -38,6 +39,7 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
+      reset();
       try {
         if (search) {
           const fetch: IStories = await getAllStories(page, search);
@@ -56,7 +58,7 @@ const Home = () => {
         }
       }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, setStories]);
 
   useEffect(() => {
@@ -85,8 +87,8 @@ const Home = () => {
 
   return (
     <>
-      {createUpdateModal && task == "CREATE" && <CreateUpdateModal />}
-      {createUpdateModal && task == "UPDATE" && <CreateUpdateModal />}
+      {createUpdateModal && task == "CREATE" && <CreateUpdateModal page = "HOME"/>}
+      {createUpdateModal && task == "UPDATE" && <CreateUpdateModal page = "HOME"/>}
       {deleteModal && <DeleteConfirmationModal />}
 
       <Header />
@@ -103,15 +105,18 @@ const Home = () => {
             </button>
           )}
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
-          {stories?.stories &&
-            stories.stories.map((story, index) => (
+        {stories?.stories ? (
+          <div className="grid grid-cols-[repeat(auto-fit,_minmax(288px,_1fr))] lg:grid-cols-[repeat(3,_minmax(288px,_1fr))] gap-4 place-items-start m-10 mt-5">
+            {stories.stories.map((story, index) => (
               <div key={index} className="w-full h-full border">
                 <Card key={story.Id} story={story} page="HOME" />
               </div>
               //
             ))}
-        </div>
+          </div>
+        ) : (
+          <StorySkeletonLoader />
+        )}
         <div className="flex justify-center mb-5 rounded-full">
           <Pagination
             count={stories?.pageCount}

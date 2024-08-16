@@ -6,6 +6,7 @@ interface IStoryContext {
   setIndex: React.Dispatch<React.SetStateAction<number | null>>;
   stories: IStories | null;
   setStories: React.Dispatch<React.SetStateAction<IStories | null>>;
+  reset: ()=> void;
 }
 
 export const StoryContext = createContext<IStoryContext>({
@@ -13,6 +14,7 @@ export const StoryContext = createContext<IStoryContext>({
   setIndex: () => null,
   stories: null,
   setStories: () => null,
+  reset: ()=> {}
 });
 
 const StoryContextProvider = ({
@@ -22,6 +24,11 @@ const StoryContextProvider = ({
 }) => {
   const [index, setIndex] = useState<number | null>(null);
   const [stories, setStories] = useState<IStories | null>(null);
+  const reset = ()=>{
+    setIndex(null);
+    setStories(null);
+  }
+
   return (
     <StoryContext.Provider
       value={{
@@ -29,6 +36,7 @@ const StoryContextProvider = ({
         setIndex,
         stories,
         setStories,
+        reset
       }}
     >
       {children}

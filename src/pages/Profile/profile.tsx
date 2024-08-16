@@ -26,12 +26,12 @@ const Profile = () => {
   const params = useParams<{ id: string }>();
   const [user, setUser] = useState<IUser | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [state, setState] = useState<
-    "PROFILE" | "EDITPROFILE" | "UPDATEPASSWORD" | "DELETE"
-  >("PROFILE");
+  const [state, setState] = useState<"EDITPROFILE" | "UPDATEPASSWORD" | null>(
+    null
+  );
   const { setMessage, setType } = useContext(ErrorSuccessContext);
   const authorized = isAuthorizedWithToken(params.id);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -114,7 +114,7 @@ const Profile = () => {
     try {
       if (params.id) {
         await updateUserById(data, params.id);
-        setState("PROFILE");
+        setState(null);
         setType("success");
         setMessage("Your profile has been updated");
       } else {
@@ -142,7 +142,7 @@ const Profile = () => {
           Password: data.NewPassword,
         });
         localStorage.setItem("token", token);
-        setState("PROFILE");
+        setState(null);
         setType("success");
         setMessage("Your password has been updated");
       } else {
@@ -159,19 +159,16 @@ const Profile = () => {
     }
   };
 
-  const handleProfile = () => {
-    setState("PROFILE");
-  };
-
   const handleEditProfile = () => {
-    setState("EDITPROFILE");
+    setState((prev) => (prev === "EDITPROFILE" ? null : "EDITPROFILE"));
   };
 
   const handleUpdatePassword = () => {
-    setState("UPDATEPASSWORD");
+    setState((prev) => (prev === "UPDATEPASSWORD" ? null : "UPDATEPASSWORD"));
   };
 
   const handleDelete = () => {
+    setState(null);
     setDeleteModal(true);
   };
 
@@ -179,159 +176,139 @@ const Profile = () => {
     <div className="flex-grow flex flex-col bg-gray-300">
       <Header />
       <ProfileNavbar id={params.id} />
-      <div className="flex-grow flex w-full min-h-full">
-        <div className="flex border-r">
-          <div className="flex flex-col w-36 justify-start">
-            <div
-              className="cursor-pointer hover:bg-gray-400 p-2 border-b"
-              onClick={handleProfile}
-            >
-              profile
-            </div>
-            {authorized && (
-              <>
-                <div
-                  className="cursor-pointer hover:bg-gray-400 p-2 border-b"
-                  onClick={handleEditProfile}
-                >
-                  Edit profile
-                </div>
-                <div
-                  className="cursor-pointer hover:bg-gray-400 p-2 border-b"
-                  onClick={handleUpdatePassword}
-                >
-                  Update password
-                </div>
-                <div
-                  className="cursor-pointer hover:bg-gray-400 p-2 border-b"
-                  onClick={handleDelete}
-                >
-                  Delete account
-                </div>
-              </>
-            )}
+      <div className="flex flex-col h-full items-center">
+        <div className="flex flex-col items-center max-w-96 h-full">
+          <div className="min-w-52 min-h-52 p-5">
+            <IconUserFilled className="w-full h-full rounded-full bg-gray-800 text-white" />
           </div>
-        </div>
-        <div className="flex-grow bg-gray-200">
-          {state === "PROFILE" &&
-            (user && (
-              <>
-                <div className="flex flex-col items-center w-full h-full shadow-lg bg-gray-200">
-                  <div className="min-w-52 min-h-52 p-5">
-                    <IconUserFilled className="w-full h-full rounded-full bg-gray-800 text-white" />
-                  </div>
 
-                  <div className="flex flex-col pb-5 items-center">
-                    <div className="font-semibold text-black">{user?.Name}</div>
-                    <div className="font-semibold text-gray-800">
-                      @{user?.UserName}
-                    </div>
-                    <div className="font-semibold text-black">
-                      {user?.Email}
-                    </div>
+          <div className="flex flex-col pb-2 items-center">
+            <div className="font-semibold text-black sm:text-4xl">
+              {user?.Name}
+            </div>
+            <div className="font-semibold text-gray-800 sm:text-2xl">
+              {user && "@"+user.UserName}
+            </div>
+            <div className="font-semibold text-black sm:text-2xl">
+              {user?.Email}
+            </div>
+          </div>
+          {authorized && (
+            <div className="flex flex-col w-full gap-1">
+              <button
+                className="w-full rounded-full border border-gray-500 hover:bg-gray-400 duration-300 p-1"
+                onClick={handleEditProfile}
+              >
+                Edit profile
+              </button>
+              {state === "EDITPROFILE" && (
+                <form
+                  className="grid grid-cols-1 place-items-end max-w-96 gap-2"
+                  onSubmit={editUserHandleSubmit(onSubmitEditProfile)}
+                >
+                  <div className="grid grid-cols-1 w-full place-items-start gap-1">
+                    <label className="font-bold">Name</label>
+                    <TextInput
+                      type="text"
+                      placeHolder="Name"
+                      register={editUserRegister}
+                      registerName="Name"
+                      defaultValue={user?.Name}
+                    />
+                    <p className="text-authWarning text-red-400">
+                      {editUserErrors.Name?.message}
+                    </p>
                   </div>
-                </div>
-              </>
-            ) )}
-          {state === "EDITPROFILE" && (
-            <div className="p-5">
-              <form
-                className="grid grid-cols-1 place-items-end max-w-96 gap-2"
-                onSubmit={editUserHandleSubmit(onSubmitEditProfile)}
+                  <div className="grid grid-cols-1 w-full place-items-start gap-1">
+                    <label className="font-bold">Email</label>
+                    <TextInput
+                      type="text"
+                      placeHolder="Email"
+                      register={editUserRegister}
+                      registerName="Email"
+                      defaultValue={user?.Email}
+                    />
+                    <p className="text-authWarning text-red-400">
+                      {editUserErrors.Email?.message}
+                    </p>
+                  </div>
+                  <Button
+                    type="submit"
+                    buttonName="Update"
+                    backgroundColor="bg-black"
+                    textColour="text-white"
+                  />
+                </form>
+              )}
+              <button
+                className="w-full rounded-full border border-gray-500 hover:bg-gray-400 duration-300 p-1"
+                onClick={handleUpdatePassword}
               >
-                <div className="grid grid-cols-1 w-full place-items-start gap-1">
-                  <label className="font-bold">Name</label>
-                  <TextInput
-                    type="text"
-                    placeHolder="Name"
-                    register={editUserRegister}
-                    registerName="Name"
-                    defaultValue={user?.Name}
+                Update password
+              </button>
+              {state === "UPDATEPASSWORD" && (
+                <form
+                  className="grid grid-cols-1 place-items-end max-w-96 gap-2"
+                  onSubmit={updatePasswordHandleSubmit(onSubmitUpdatePassword)}
+                >
+                  <div className="grid grid-cols-1 w-full place-items-start gap-1">
+                    <label className="font-bold">Current Password</label>
+                    <PasswordInput
+                      placeHolder="Current Password"
+                      register={updatePasswordRegister}
+                      registerName="CurrentPassword"
+                    />
+                    <p className="text-authWarning text-red-400">
+                      {updatePasswordErrors.CurrentPassword?.message}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 w-full place-items-start gap-1">
+                    <label className="font-bold">New Password</label>
+                    <PasswordInput
+                      placeHolder="New Password"
+                      register={updatePasswordRegister}
+                      registerName="NewPassword"
+                    />
+                    <p className="text-authWarning text-red-400">
+                      {updatePasswordErrors.NewPassword?.message}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 w-full place-items-start gap-1">
+                    <label className="font-bold">Confirm Password</label>
+                    <PasswordInput
+                      placeHolder="Confirm Password"
+                      register={updatePasswordRegister}
+                      registerName="NewPasswordAgain"
+                    />
+                    <p className="text-authWarning text-red-400">
+                      {updatePasswordErrors.NewPasswordAgain?.message}
+                    </p>
+                  </div>
+                  <Button
+                    type="submit"
+                    buttonName="Update"
+                    backgroundColor="bg-black"
+                    textColour="text-white"
                   />
-                  <p className="text-authWarning text-red-400">
-                    {editUserErrors.Name?.message}
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 w-full place-items-start gap-1">
-                  <label className="font-bold">Email</label>
-                  <TextInput
-                    type="text"
-                    placeHolder="Email"
-                    register={editUserRegister}
-                    registerName="Email"
-                    defaultValue={user?.Email}
-                  />
-                  <p className="text-authWarning text-red-400">
-                    {editUserErrors.Email?.message}
-                  </p>
-                </div>
-                <Button
-                  type="submit"
-                  buttonName="Update"
-                  backgroundColor="bg-black"
-                  textColour="text-white"
-                />
-              </form>
-            </div>
-          )}
-          {state === "UPDATEPASSWORD" && (
-            <div className="p-5">
-              <form
-                className="grid grid-cols-1 place-items-end max-w-96 gap-2"
-                onSubmit={updatePasswordHandleSubmit(onSubmitUpdatePassword)}
+                </form>
+              )}
+              <button
+                className="w-full rounded-full border border-gray-500 hover:bg-gray-400 duration-300 p-1"
+                onClick={handleDelete}
               >
-                <div className="grid grid-cols-1 w-full place-items-start gap-1">
-                  <label className="font-bold">Current Password</label>
-                  <PasswordInput
-                    placeHolder="Current Password"
-                    register={updatePasswordRegister}
-                    registerName="CurrentPassword"
-                  />
-                  <p className="text-authWarning text-red-400">
-                    {updatePasswordErrors.CurrentPassword?.message}
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 w-full place-items-start gap-1">
-                  <label className="font-bold">New Password</label>
-                  <PasswordInput
-                    placeHolder="New Password"
-                    register={updatePasswordRegister}
-                    registerName="NewPassword"
-                  />
-                  <p className="text-authWarning text-red-400">
-                    {updatePasswordErrors.NewPassword?.message}
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 w-full place-items-start gap-1">
-                  <label className="font-bold">Confirm Password</label>
-                  <PasswordInput
-                    placeHolder="Confirm Password"
-                    register={updatePasswordRegister}
-                    registerName="NewPasswordAgain"
-                  />
-                  <p className="text-authWarning text-red-400">
-                    {updatePasswordErrors.NewPasswordAgain?.message}
-                  </p>
-                </div>
-                <Button
-                  type="submit"
-                  buttonName="Update"
-                  backgroundColor="bg-black"
-                  textColour="text-white"
-                />
-              </form>
-            </div>
-          )}
-
-          {deleteModal && (
-            <div className="p-5">
-              <DeleteConfirmationModal
-                id={params.id}
-                setDeleteModal={setDeleteModal}
-              />
+                Delete account
+              </button>
             </div>
           )}
         </div>
+        {deleteModal && (
+          <div className="p-5">
+            <DeleteConfirmationModal
+              id={params.id}
+              setDeleteModal={setDeleteModal}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createStory, getAllStories, updateStory } from "../../api/storyAPI";
+import {
+  createStory,
+  getAllStories,
+  getStoryByUserId,
+  updateStory,
+} from "../../api/storyAPI";
 import {
   ICreateStoryInfo,
   ICreateStoryInput,
@@ -8,26 +13,29 @@ import {
 } from "../../interfaces/story";
 import Button from "../Button/button";
 import * as yup from "yup";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CreateUpdateDeleteContext } from "../../contexts/createupdatedeleteContext";
 import { StoryContext } from "../../contexts/storyContext";
 import { getUserId, getUserName } from "../../helpers/jwtHelper";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
+import LinearProgress from "@mui/material/LinearProgress";
+import Box from "@mui/material/Box";
 
 interface IModal {
+  page: "HOME" | "PROFILE";
   story?: IStory | null;
   setStory?: React.Dispatch<React.SetStateAction<IStory | null>>;
 }
 
-const Modal = ({ story, setStory }: IModal) => {
+const Modal = ({ page, story, setStory }: IModal) => {
   const navigate = useNavigate();
   const { task, storyId, storyTitle, storyDescription, setCreateUpdateModal } =
     useContext(CreateUpdateDeleteContext);
-  const { setMessage, setType } =
-    useContext(ErrorSuccessContext);
+  const { setMessage, setType } = useContext(ErrorSuccessContext);
   const { stories, setStories } = useContext(StoryContext);
+  const [progress, setProgress] = useState<boolean>(false);
   const schema: yup.ObjectSchema<ICreateStoryInput> = yup.object().shape({
     Title: yup.string().max(100, "Title must be under 100 charcter").required(),
     Description: yup
@@ -59,12 +67,13 @@ const Modal = ({ story, setStory }: IModal) => {
   const onSubmit: SubmitHandler<ICreateStoryInput> = async (
     data: ICreateStoryInput
   ) => {
+    setProgress(true);
     try {
       if (task == "CREATE") {
         const AuthorId = getUserId();
         const AuthorUserName = getUserName();
         if (!AuthorId || !AuthorUserName) {
-          setType('error')
+          setType("error");
           setMessage("You are not authorized");
         } else {
           const createStoryInfo: ICreateStoryInfo = {
@@ -72,14 +81,16 @@ const Modal = ({ story, setStory }: IModal) => {
             Description: data.Description,
           };
           await createStory(createStoryInfo);
-          setStories(await getAllStories());
-          setType('success')
+          if (page === "HOME") setStories(await getAllStories());
+          else setStories(await getStoryByUserId(AuthorId));
+          setType("success");
           setMessage("Your story created successfully");
-          navigate("/");
+
+          navigate("");
         }
       } else if (task == "UPDATE" && storyId) {
         await updateStory(data, storyId);
-        setType('success')
+        setType("success");
         setMessage("Your story updated successfully");
         if (story && setStory) {
           story.Title = data.Title;
@@ -96,16 +107,17 @@ const Modal = ({ story, setStory }: IModal) => {
           setStories(stories);
         }
       }
-      setCreateUpdateModal(false);
     } catch (error) {
       if (error instanceof AxiosError) {
-        setType('error')
+        setType("error");
         setMessage(error.response?.data.message);
       } else {
-        setType('error')
+        setType("error");
         setMessage("An unexpected error occurred.");
       }
     }
+    setProgress(false);
+    setCreateUpdateModal(false);
   };
 
   return (
@@ -115,15 +127,12 @@ const Modal = ({ story, setStory }: IModal) => {
         onClick={onDivClick}
       >
         <div
-          className="absolute flex flex-col items-center min-w-[288px] w-1/2 h-2/3 bg-white rounded-lg"
+          className="absolute flex flex-col items-center min-w-[288px] w-1/2 bg-white"
           onClick={(e) => e.stopPropagation()}
         >
-          <label className="text-2xl font-bold mt-6">
+          <label className="text-2xl font-bold m-6">
             {task === "CREATE" ? "Create" : "Update"} your story
           </label>
-          <p className="text-authWarning text-red-400">
-            {errors.Description?.message}
-          </p>
           <p className="text-authWarning text-red-400">
             {errors.Title?.message}
           </p>
@@ -137,17 +146,20 @@ const Modal = ({ story, setStory }: IModal) => {
                 placeholder="Title"
                 className="border border-black w-5/6 h-10 p-2"
                 onKeyDown={handleKeyPress}
-                defaultValue={task==='UPDATE' ? storyTitle||"" : ""}
+                defaultValue={task === "UPDATE" ? storyTitle || "" : ""}
                 required
                 {...register("Title")}
               />
+              <p className="text-authWarning text-red-400">
+                {errors.Description?.message}
+              </p>
               <textarea
-                className="border border-black w-5/6 h-60 p-2"
+                className="border border-black w-5/6 h-60 p-2  resize-none"
                 placeholder="Description"
-                defaultValue={(task==='UPDATE') ? storyDescription||"" : ""}
+                defaultValue={task === "UPDATE" ? storyDescription || "" : ""}
                 {...register("Description")}
               ></textarea>
-              <div className="flex flex-col items-end w-5/6">
+              <div className={`flex flex-col items-end w-5/6 mb-6 ${progress && "pointer-events-none"}`}>
                 <Button
                   type="submit"
                   buttonName={task === "CREATE" ? "Create" : "Update"}
@@ -157,6 +169,11 @@ const Modal = ({ story, setStory }: IModal) => {
               </div>
             </div>
           </form>
+          {progress && (
+            <Box sx={{ width: "100%" }}>
+              <LinearProgress color="inherit"/>
+            </Box>
+          )}
         </div>
       </div>
     </>

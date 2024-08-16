@@ -36,7 +36,7 @@ const SignUp = () => {
     Password: yup
       .string()
       .matches(
-        /^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$/,
+        /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d\W_]{8,}$/,
         "The minimum length of Password is 8 and it must contain atleast one character and one number"
       )
       .max(30, "Password must be under 30 charcter")

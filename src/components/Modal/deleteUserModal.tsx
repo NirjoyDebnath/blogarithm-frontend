@@ -1,24 +1,29 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Button from "../Button/button";
 import { ErrorSuccessContext } from "../../contexts/errorsuccessContext";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "../../api/userAPI";
 import { AxiosError } from "axios";
 
-interface IDeleteConfirmationModal{
-  id:string|undefined;
+interface IDeleteConfirmationModal {
+  id: string | undefined;
   setDeleteModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DeleteConfirmationModal = ({id, setDeleteModal}:IDeleteConfirmationModal) => {
+const DeleteConfirmationModal = ({
+  id,
+  setDeleteModal,
+}: IDeleteConfirmationModal) => {
   const { setMessage, setType } = useContext(ErrorSuccessContext);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleCancel = () => {
     setDeleteModal(false);
   };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       if (id) {
         await deleteUser(id!);
@@ -37,6 +42,7 @@ const DeleteConfirmationModal = ({id, setDeleteModal}:IDeleteConfirmationModal) 
         setMessage("An unexpected error occurred.");
       }
     }
+    setLoading(false);
     setDeleteModal(false);
   };
 
@@ -56,7 +62,11 @@ const DeleteConfirmationModal = ({id, setDeleteModal}:IDeleteConfirmationModal) 
           This action cannot be undone. Please confirm if you want to proceed
           with the deletion.
         </p>
-        <div className="mt-4 flex justify-end space-x-2">
+        <div
+          className={`mt-4 flex justify-end space-x-2 ${
+            loading && "pointer-events-none"
+          }`}
+        >
           <Button
             type="submit"
             buttonName="cancel"

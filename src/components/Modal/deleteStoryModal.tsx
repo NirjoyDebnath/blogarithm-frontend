@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Button from "../Button/button";
 import { CreateUpdateDeleteContext } from "../../contexts/createupdatedeleteContext";
 import { deleteStory } from "../../api/storyAPI";
@@ -10,12 +10,14 @@ const DeleteConfirmationModal = () => {
   const { setMessage, setType } = useContext(ErrorSuccessContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleCancel = () => {
     setDeleteModal(false);
   };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       if (storyId) {
         await deleteStory(storyId!);
@@ -31,6 +33,7 @@ const DeleteConfirmationModal = () => {
       setType("error");
       setMessage("Problem");
     }
+    setLoading(false);
     setDeleteModal(false);
   };
 
@@ -50,7 +53,7 @@ const DeleteConfirmationModal = () => {
           This action cannot be undone. Please confirm if you want to proceed
           with the deletion.
         </p>
-        <div className="mt-4 flex justify-end space-x-2">
+        <div className={`mt-4 flex justify-end space-x-2 ${loading && "pointer-events-none"}`}>
           <Button
             type="submit"
             buttonName="cancel"
