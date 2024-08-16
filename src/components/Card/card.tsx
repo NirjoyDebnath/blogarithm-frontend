@@ -155,7 +155,7 @@ const Card = ({ story, page }: IStoryCard) => {
           </p>
         </Link>
         <label className="text-xs">
-          {format(new Date(story.CreatedAt), "yyyy-MM-dd h:mma")}
+          {format((story.CreatedAt), "yyyy-MM-dd h:mma")}
         </label>
 
         <div className="mt-5 flex-grow break-words w-full">

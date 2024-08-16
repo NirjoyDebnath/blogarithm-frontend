@@ -161,10 +161,7 @@ const Story = () => {
                         </p>
                       </Link>
                       <div className="text-xs pb-2 pl-3">
-                        {format(
-                          new Date(comment.CreatedAt),
-                          "yyyy-MM-dd h:mma"
-                        )}
+                        {format(comment.CreatedAt, "yyyy-MM-dd h:mma")}
                       </div>
                       <p className="pb-3">{comment.Comment}</p>
                     </div>
