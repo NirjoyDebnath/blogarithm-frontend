@@ -1,30 +1,37 @@
-# React + TypeScript + Vite
+# Blogarithm Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend for Blogarithm — a blog platform where users can create stories, comment and like posts. Built with React, TypeScript and Material UI.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Sign up and login with JWT authentication
+- Browse, create, update and delete stories
+- Comment and like on stories
+- User profile management
+- Form validation with React Hook Form and Yup
+- PDF export with jsPDF
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+React, TypeScript, Vite, Material UI, Tailwind CSS, Axios, React Router, React Hook Form
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+**Requirements:** Node.js
+
+```bash
+git clone https://github.com/NirjoyDebnath/blogarithm-frontend.git
+cd blogarithm-frontend
+npm install
+cp .env.example .env   # fill in your values
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Scripts
+
+```bash
+npm run dev       # start development server
+npm run build     # build for production
+npm run preview   # preview production build
+npm run lint      # lint
+```
